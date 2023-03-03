@@ -528,7 +528,7 @@ ND proxies can also serve IPv6 nodes that still rely on classical IPv6 ND in a c
 
      <section anchor='sgp' > <name>Subnet Gateway Protocols</name>
      <t>
-     The /64 boundary creates a wall between the traditional Interior Gateway Protocols (IGP) that operate between Subnets and manipulate shorter than 64 prefixes, and Subnet Gateway Protocols (SGP) that  operate inside a Subnet and manipulate shorter than 64 prefixes, typically /128 host routes, and possibly more specific data like Link-Layer Address mappings and Address Proof of Ownership.
+     The /64 boundary creates a wall between the traditional Interior Gateway Protocols (IGP) that operate between Subnets and manipulate shorter than 64 prefixes, and Subnet Gateway Protocols (SGP) that  operate inside a Subnet and manipulate longer than 64 prefixes, typically /128 host routes, and possibly more specific data like Link-Layer Address mappings and Address Proof of Ownership.
      </t>
      <t>As opposed to classical IGPs, an SGP must support rapid mobility of addresses to cope with wireless devices and virtual machines mobility. In that regard, an SGP operates mores as a MANET protocol than as a classical IGP. Ideally, there should be no stale route, and no microloop. A classical method in MANETs to achieve this is to sequence the movements and advertise the sequence in the routing protocol, so only routes with the most recent sequence can be followed, and once a packet starts following a route with a certain sequence, it must be discarded rather to have to follow a path with an older sequence. To support this approach, the node that registers an address must be the owner of a mobility sequence number and update that sequence when it moves.
      </t>
