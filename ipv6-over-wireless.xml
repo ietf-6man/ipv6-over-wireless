@@ -462,18 +462,7 @@ If the Link-Layer address of the peer is not visible from the IP layer when proc
    <section anchor='subdef' > <name>IP Subnets</name>
 <t>IPv6 builds another abstraction, the IP subnet, over one shared IP link or over a collection IP links, forming a MLSN in the latter case. An MLSN is formed over IP links (e.g., P2P or P2MP) that are interconnected by routers that either inject hosts routes in an IGP, in which case the topology can be anything, or perform ND proxy operations, in which case the structure of links must be strictly hierarchical to avoid loops.
 </t>
-<t><xref target="RFC8929"/> defines bridging and routing IPv6 ND proxies.
-Both forms of ND proxies interconnect IP links and enable to isolate the layer 2
-broadcast domains. But in the case of a bridging proxy, the layer 2 unicast
-communication can still exist between the layer 2 domains that are covered by
-the layer 3 links, whereas in the base of a routing proxy, they are isolated, and
-packets must be routed back and forth. Bridging proxies are possible between
-compatible technologies and translational bridges (e.g., Wi-Fi to Ethernet),
-whereas routing proxies are required between non-bridgeable technologies and
-desirable to avoid exposing the layer 2 addresses across, e.g., for reasons of
-stability and scalability.
-</t>
-<t>It is another network design decision to use one IP subnet model or another over a given lower layer network. A switched fabric can host one or more IP subnets, in which case the IP links can reach all and beyond one subnet. On the other hand, a subnet can encompass a collection of links; in that case, the scope of the link local addresses, which is the IP Link, is narrower than the span of the subnet.
+<t>It is a network design decision to use one IP subnet model or another over a given lower layer network. A switched fabric can host one or more IP subnets, in which case the IP links can reach all and beyond one subnet. On the other hand, a subnet can encompass a collection of links; in that case, the scope of the link local addresses, which is the IP Link, is narrower than the span of the subnet.
 </t>
 <t>A subnet prefix is associated with the IP subnet, and a node is a member of an IP
 subnet when it has an IP address that derives from that prefix. The IP address is
@@ -485,6 +474,21 @@ The switched and routed fabric above could be the exact same network of physical
 </t>
 
      </section><!-- IP Subnets -->
+
+
+     <section anchor='proxy' > <name>ND Proxies</name>
+<t><xref target="RFC8929"/> defines bridging and routing IPv6 ND proxies.
+Both forms of ND proxies interconnect IP links and enable to isolate the layer 2
+broadcast domains. But in the case of a bridging proxy, the layer 2 unicast
+communication can still exist between the layer 2 domains that are covered by
+the layer 3 links, whereas in the base of a routing proxy, they are isolated, and
+packets must be routed back and forth. Bridging proxies are possible between
+compatible technologies and translational bridges (e.g., Wi-Fi to Ethernet),
+whereas routing proxies are required between non-bridgeable technologies and
+desirable to avoid exposing the layer 2 addresses across, e.g., for reasons of
+stability and scalability.
+</t>
+     </section><!-- ND Proxies -->
 
 
      <section anchor='sgp' > <name>Subnet Gateway Protocols</name>
