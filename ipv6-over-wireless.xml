@@ -398,12 +398,14 @@ A Link Local Address only needs to be unique within that peer to peer relationsh
     +--------------------
     |
     |   IP Link 1 ---------------------------> Node 1
+    |      LLA 1
     |   IP Link 2 ---------------------------> Node 2
+    |      LLA 2
     |                ...
-    |   IP Link N ---------------------------> Node N
     |
+    |             (LLA 1 may be the same as LLA 2)
     +--------------------
-      Physical Interface
+      Physical interface
 
 
 ]]></artwork>
@@ -422,6 +424,33 @@ If the Link-Layer address of the peer is not visible from the IP layer when proc
    <t>
    an IP Interface is an abstraction that connects the host with a collection of IP Links (for the purpose of link local communication) and bundles the interfaces for each IP Subnet in subInterfaces. The host installs at least one link-local address on an IP Interface for each IP Link that is connected through that interface, and one subInterface per Subnet. The same Link-Local address may be reused over different IP Links as long as it is not a collision for the peer on that IP Link. Similarly, the host installs at least one global (or unique local as appropriate) address on an IP subInterface for the associated Subnet, and the address is advertised over each IP Link in the Subnet.
 </t>
+
+<figure anchor='figInt'><name>Interface Abstraction</name>
+ <artwork><![CDATA[
+
+
+    +--------------------
+    |
+    |   IP SubInterface a  ------------------> IP Link A
+    |      IP Subnet a::/64                    IP Link B
+    |         IP Address a::1 .. a::n             ...
+    |                                          IP Link N
+    |
+    |   IP SubInterface b  ------------------> IP Link A
+    |      IP Subnet b::/64                    IP Link D
+    |         IP Address b::1 .. b::n                 ...
+    |                                          IP Link P
+    |                ...
+    |
+    |          (Link A and Link B may be on
+    |           different physical interfaces)
+    +--------------------
+      IP Interface
+
+
+
+]]></artwork>
+</figure>
    </li>
 
    <li>
