@@ -17,7 +17,7 @@
 updates="RFC4291" consensus="true" submissionType="IETF" xml:lang="en" version="3" docName="draft-thubert-6man-ipv6-over-wireless-13" >
 
 <front>
-  <title abbrev="IPv6 over NBMA">Architecture and Framework for IPv6 over Non-Broadcast Access"</title>
+  <title abbrev="IPv6 over NBMA">Architecture and Framework for IPv6 over Non-Broadcast Access</title>
 
    <author initials='P' surname='Thubert' fullname='Pascal Thubert' role='editor'>
       <organization abbrev='Cisco Systems'>Cisco Systems, Inc</organization>
@@ -374,10 +374,13 @@ The lower layer subnetwork may comprise multiple lower layer links, e.g., in the
 </li>
 <li>an IP link defines the scope of an LLA, and defines the domain in which the
 LLA must be unique</li>
-<li>an IP link provides a subset of the connectivity that is offered by the
+<li>
+An IP Link is attached to a physical interface, and one Link Local Address is associated to the IP Link.
+</li>
+<li>an IP link provides a subset of the connectivity that is offered by the physical link at the
 lower layer; if the IP link is narrower than the layer 2 reachable domain, then
 layer 3 filters must restrict the link-scoped communication to remain between
-peers on a same IP link, and more than one IP link may be installed on the same
+peers on a same IP link. More than one IP link may be installed on the same
 physical interface to connect to different peers.
 </li>
 <li>an IP link can be Point to Point (P2P), Point to Point (P2MP, forming a partial mesh), NBMA (non-broadcast multi-access, fully meshed), or transit (broadcast-capable and any-to-any).
@@ -386,32 +389,34 @@ physical interface to connect to different peers.
 </ul>
 <t>It is a network design decision to use one IP link model or another over a given lower layer network, e.g., to map a Frame Relay network as a P2MP IP link, or as a collection of P2P IP links. As another example, an Ethernet fabric may be bridged, in which case the nodes that interconnect the layer 2 links are L2 switches, and the fabric can be abstracted as a single transit IP link; or the fabric can be routed, in which case the P2P IP links are congruent with the layer 2 links, and the nodes that interconnect the links are routers.
 </t>
-<t> This architecture only uses P2P Link abstractions.
-A physical interface may enable to reach to more than one peer at layer 2.
-In that case, this architecture maps each peer relationship as a different IP Link.
+<t> This architecture only uses P2P Link abstractions as shown in <xref target='figLink'/>, where an IP link is identified by a pair of local and remote Link Layer Address.
+A physical interface may enable to reach to more than one peer at layer 2; in that case, this architecture maps each peer relationship as a different IP Link.
 A Link Local Address only needs to be unique within that peer to peer relationship.
 </t>
 
-<figure anchor='figLink'><name>Link Abstraction</name>
+<figure anchor='figLink'><name>P2P Link Abstraction</name>
  <artwork><![CDATA[
 
-    +--------------------
-    |
-    |   IP Link 1 ---------------------------> Node 1
-    |      LLA 1
-    |   IP Link 2 ---------------------------> Node 2
-    |      LLA 2
-    |                ...
-    |
-    |             (LLA 1 may be the same as LLA 2)
-    +--------------------
++--------------------
+|
+|   IP Link 1 ---------------------------> Node 1
+       Link Layer Address 1                Link Layer Address N1
+|      Link Local Address LLA1             Link Local Address LLAN1
+|
+|   IP Link 2 ---------------------------> Node 2
+       Link Layer Address 2                Link Layer Address N2
+|      Link Local Address LLA2             Link Local Address LLAN2
+|                ...
+|
+|             (LLA 1 may be the same as LLA 2)
++--------------------
       Physical interface
 
 
 ]]></artwork>
 </figure>
 <t>
-If the Link-Layer address of the peer is not visible from the IP layer when processing a message, then the IP layer cannot discriminate the IP Link of packets arriving on the same interface, and for that reason, it will reject a second registration for the same Link Local Address by a second host, meaning that a Link Local Address will have to be unique on a physical interface across IP Links.= that this interface connects to. In that case, the Link Local Address of the peer is used to recognize the IP Link, and all addresses registered with the same Link Local Address will be associated to the that IP Link.
+If only the physical interface but not the Link-Layer address of the peer is visible from the IP layer when processing a message, then the IP layer cannot discriminate the IP Link of packets arriving on the same interface, and for that reason, it will reject a second registration for the same Link Local Address by a second peer, meaning that a Link Local Address will have to be unique on a physical interface across IP Links. In that case, the Link Local Address of the peer is used to identify the IP Link, and all the addresses registered to this node with the same peer Link Local Address as source will be associated to the same IP Link to that peer.
 </t>
 
      </section><!-- IP Links -->
@@ -425,32 +430,6 @@ If the Link-Layer address of the peer is not visible from the IP layer when proc
    an IP Interface is an abstraction that connects the host with a collection of IP Links (for the purpose of link local communication) and bundles the interfaces for each IP Subnet in subInterfaces. The host installs at least one link-local address on an IP Interface for each IP Link that is connected through that interface, and one subInterface per Subnet. The same Link-Local address may be reused over different IP Links as long as it is not a collision for the peer on that IP Link. Similarly, the host installs at least one global (or unique local as appropriate) address on an IP subInterface for the associated Subnet, and the address is advertised over each IP Link in the Subnet.
 </t>
 
-<figure anchor='figInt'><name>Interface Abstraction</name>
- <artwork><![CDATA[
-
-
-    +--------------------
-    |
-    |   IP SubInterface a  ------------------> IP Link A
-    |      IP Subnet a::/64                    IP Link B
-    |         IP Address a::1 .. a::n             ...
-    |                                          IP Link N
-    |
-    |   IP SubInterface b  ------------------> IP Link A
-    |      IP Subnet b::/64                    IP Link D
-    |         IP Address b::1 .. b::n                 ...
-    |                                          IP Link P
-    |                ...
-    |
-    |          (Link A and Link B may be on
-    |           different physical interfaces)
-    +--------------------
-      IP Interface
-
-
-
-]]></artwork>
-</figure>
    </li>
 
    <li>
@@ -458,10 +437,63 @@ If the Link-Layer address of the peer is not visible from the IP layer when proc
    </li>
    </ul>
 
+<figure anchor='figInt'><name>Interface Abstraction</name>
+ <artwork><![CDATA[
++--------------------
+|
+|   IP SubInterface a  ------------------> IP Link A
+|      IP Subnet a::/64                    IP Link B
+|         IP Addresses a::1 .. a::n           ...
+|                                          IP Link N
+|
+|   IP SubInterface b  ------------------> IP Link A
+|      IP Subnet b::/64                    IP Link D
+|         IP Addresses b::1 .. b::n           ...
+|                                          IP Link P
+|                ...
+|
+|  (Link A and B may be attached to different physical interfaces)
+|  (Link A may belong to both subInterfaces a and b)
+|
++--------------------
+      IP Interface
+]]></artwork>
+</figure>
      </section><!-- IP Interfaces -->
    <section anchor='subdef' > <name>IP Subnets</name>
 <t>IPv6 builds another abstraction, the IP subnet, over one shared IP link or over a collection IP links, forming a MLSN in the latter case. An MLSN is formed over IP links (e.g., P2P or P2MP) that are interconnected by routers that either inject hosts routes in an IGP, in which case the topology can be anything, or perform ND proxy operations, in which case the structure of links must be strictly hierarchical to avoid loops.
 </t>
+
+
+
+<figure anchor='figsn'><name>Subnet Abstraction</name>
+ <artwork><![CDATA[
++--------------------
+|                                              router 4
+|                                              ^    ^
+| +----------------------------------+      /       |
+| |      L2 broadcast domain        IP Link     IP Link
+| |                               /  |              |
+| |                            v     |              v
+| |  router1 <--IP Link--> router 2 <--IP Link--> router 3
+| |    ^  ^                 ^  ^     |              ^
+| |    |    \             /    |     |              |
+| | IP Link IP Link IP Link IP Link  |          IP Link
+| |    |       \      /        |     |              |
+| |    v         v  v          v     |              v
+| |  host 1     host 2       host 3  |           host 4
+| |                                  |
+| +----------------------------------+
+|
+|  (Different IP Links may be sustained by different media)
+|
++--------------------
+
+      IP Subnet
+
+]]></artwork>
+</figure>
+
 <t>It is a network design decision to use one IP subnet model or another over a given lower layer network. A switched fabric can host one or more IP subnets, in which case the IP links can reach all and beyond one subnet. On the other hand, a subnet can encompass a collection of links; in that case, the scope of the link local addresses, which is the IP Link, is narrower than the span of the subnet.
 </t>
 <t>A subnet prefix is associated with the IP subnet, and a node is a member of an IP
@@ -477,7 +509,7 @@ The switched and routed fabric above could be the exact same network of physical
 
 
      <section anchor='proxy' > <name>ND Proxies</name>
-<t><xref target="RFC8929"/> defines bridging and routing IPv6 ND proxies.
+<t><xref target="RFC8929"/> defines bridging and routing IPv6 ND proxies for registering nodes / registered addresses.
 Both forms of ND proxies interconnect IP links and enable to isolate the layer 2
 broadcast domains. But in the case of a bridging proxy, the layer 2 unicast
 communication can still exist between the layer 2 domains that are covered by
@@ -487,6 +519,9 @@ compatible technologies and translational bridges (e.g., Wi-Fi to Ethernet),
 whereas routing proxies are required between non-bridgeable technologies and
 desirable to avoid exposing the layer 2 addresses across, e.g., for reasons of
 stability and scalability.
+</t>
+<t>
+ND proxies can also serve IPv6 nodes that still rely on classical IPv6 ND in a coexistence scenario. The ND proxy intercepts (snoops) the multicast NS messages from the nodes and, in case or AR or DAD, polls the registrar to lookup whether an active mapping exists for the Target. When that is the case, the ND proxy may forward the NS message as a Layer-2 unicast to the node that owns the binding, else it may either drop the multicast or broadcast it at Layer-2. Once the node formed an address, the ND proxy fills the registrar to associate the IPv6 address with the node. The method is brittle, since there is no contract with the node to guarantee the ownership, no "contract", as discussed in <xref target ="mbIssues"/>, so for those addresses, the registrar may be inaccurate.
 </t>
      </section><!-- ND Proxies -->
 
@@ -581,7 +616,7 @@ To increase the chances that all nodes in the BSS receive the broadcast transmis
 </t>
 <t>
 For that reason, upper layer protocols should tend to avoid the use of broadcast when operating over Wi-Fi.
-To cope with this problems, APs may implement strategies such as turn a broadcast into a series of unicast transmissions, or drop the message altogether, which may impact the upper layer protocols. For instance, some APs may not copy Router Solicitation (RS) messages under the assumption that there is no router across the wireless interface. This assumption may be correct at some point of time and may become incorrect in the future. Another strategy used in Wi-Fi APS is to proxy protocols that heavily rely on broadcast, such as the Address Resolution in ARP and ND-Classic, and either respond on behalf or preferably forward the broadcast frame as a unicast to the intended Target.
+To cope with these problems, APs may implement strategies such as turn a broadcast into a series of unicast transmissions, or drop the message altogether, which may impact the upper layer protocols. For instance, some APs may not copy Router Solicitation (RS) messages under the assumption that there is no router across the wireless interface. This assumption may be correct at some point of time and may become incorrect in the future. Another strategy used in Wi-Fi APS is to proxy protocols that heavily rely on broadcast, such as the Address Resolution in ARP and ND-Classic, and either respond on behalf or preferably forward the broadcast frame as a unicast to the intended Target.
 </t>
 <t>
 In an <xref target="IEEEstd80211">IEEE Std. 802.11</xref> Infrastructure Extended Service Set (ESS), infrastructure BSSes are interconnected by a bridged network, typically running Transparent Bridging and the Spanning tree Protocol or a more advanced Layer 2 Routing (L2R) scheme. In the original model of learning bridges, the forwarding state is set by observing the source MAC address of the frames. When a state is missing for a destination MAC address, the frame is broadcasted with the expectation that the response will populate the state on the reverse path. This is a reactive operation, meaning that the state is populated reactively to the need to reach a destination.
@@ -689,7 +724,7 @@ The EARO provides information to the router that is independent to the routing p
 <t>
 Wireless ND (WiND) is an example instantiation of the Architecture presented in <xref target="NBNTArchi"/>; it combines SFAAC with a Backbone Router (6BBR) ND proxy function (more in <xref target="RFC8929"/>) operating as a Layer-3 Access Point. Multiple 6BBRs placed along the wireless edge of a Backbone link handle IPv6 Neighbor Discovery and forward packets over the backbone on behalf of the registered nodes on the wireless edge.
 This enables to span a subnet over an MLSN that federates edge wireless links with a high-speed, typically Ethernet, backbone (as a Layer-3 ESS). The ND proxy maintains the reachability for Global Unicast and Link-Local Addresses within the federated MLSN, either as a routing proxy where it replies with its own MAC address or as a bridging proxy that typically forwards the multicast ND messages as unicast Layer-2 frames to their target. The wireless nodes can form any address they want and move freely from a wireless edge link to another, without renumbering.
-In that case, the registrar is distributed between the 6BBR, each 6BBR maintaining only a state for the subset of the addresses that were registered to it and for which it is authoritative. When the 6BBR is not currently authoritative for a new address being registererd to it, it relies on Classical ND that is used reactively over the backbone to obtain an existing registration state in
+In that case, the registrar is distributed between the 6BBR, each 6BBR maintaining only a state for the subset of the addresses that were registered to it and for which it is authoritative. When the 6BBR is not currently authoritative for a new address being registered to it, it relies on Classical ND that is used reactively over the backbone to obtain an existing registration state in
 
 </t>
 
@@ -1114,7 +1149,9 @@ In other words, the 6BBRs collectively form a global registrar for the Subnet th
    </section><!-- "Security Considerations" -->
 
    <section > <name>Acknowledgments</name>
-   <t>Many thanks to the participants of the 6lo WG where a lot of the work discussed here happened, following work at ROLL, 6TiSCH, and mainly 6LoWPAN. Special thanks to Brian Carpenter and Eric Levy-Abegnoli who provided support and useful comments throughout the development of this architecture, and to Erik Nordmark and Zach Shelby with whom this work really started during IETF 72 in Dublin.
+   <t>Many thanks to the participants of the 6lo WG where a lot of the work discussed here happened, following work at ROLL, 6TiSCH, and mainly 6LoWPAN.
+   </t><t>
+   Special thanks to Brian Carpenter and Eric Levy-Abegnoli who provided support and useful comments throughout the development of this architecture, and to Erik Nordmark and Zach Shelby with whom this work really started during IETF 72 in Dublin.
    </t>
    <t>
    Also many thanks to Eduard Vasilenko, XiPeng Xiao, for their contributions and support to this work at 6MAN, v6Ops, and ETSI IPE.
