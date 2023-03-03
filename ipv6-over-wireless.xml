@@ -1,0 +1,1225 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE rfc SYSTEM "rfc2629-xhtml.ent">
+
+<?rfc toc="yes"?>
+<?rfc tocompact="yes"?>
+<?rfc tocdepth="3"?>
+<?rfc tocindent="yes"?>
+<?rfc symrefs="yes"?>
+<?rfc sortrefs="yes"?>
+<?rfc comments="yes"?>
+<?rfc inline="yes"?>
+<?rfc compact="no"?>
+<?rfc subcompact="no"?>
+<?rfc authorship="yes"?>
+<?rfc tocappendix="yes"?>
+<rfc  xmlns:xi="http://www.w3.org/2001/XInclude" category="info" ipr='trust200902' tocInclude="true"  obsoletes=""
+updates="RFC4291" consensus="true" submissionType="IETF" xml:lang="en" version="3" docName="draft-thubert-6man-ipv6-over-wireless-13" >
+
+<front>
+  <title abbrev="IPv6 over NBMA">Architecture and Framework for IPv6 over Non-Broadcast Access"</title>
+
+   <author initials='P' surname='Thubert' fullname='Pascal Thubert' role='editor'>
+      <organization abbrev='Cisco Systems'>Cisco Systems, Inc</organization>
+      <address>
+         <postal>
+            <street>Building D</street>
+            <street>45 Allee des Ormes - BP1200 </street>
+            <city>Mougins - Sophia Antipolis</city>
+            <code>06254</code>
+          <country>France</country>
+         </postal>
+         <phone>+33 497 23 26 34</phone>
+         <email>pthubert@cisco.com</email>
+      </address>
+   </author>
+
+
+    <author fullname="Michael C. Richardson" initials="M."
+            surname="Richardson">
+      <organization abbrev="Sandelman">Sandelman Software Works</organization>
+
+      <address>
+        <email>mcr+ietf@sandelman.ca</email>
+
+        <uri>http://www.sandelman.ca/</uri>
+      </address>
+    </author>
+   <date/>
+   <area>Internet Area</area>
+   <workgroup>6MAN</workgroup>
+   <keyword>Draft</keyword>
+   <abstract>
+      <t>
+    This document extends RFC 4291 for IPv6 over modern Non-Broadcast /
+    Non-Transitive networks that decouples the physical concepts of interface,
+    link and broadcast domain from the IP concepts of Interface, Link and
+    Subnet, with the primary goal to apply on networks where broadcast is
+    undesirable. A study of the issues with classical ND over wireless media is
+    presented, and a framework to solve those issues within the new architecture
+    is proposed.
+      </t>
+   </abstract>
+</front>
+
+<middle>
+
+   <section anchor="introduction"> <name>Introduction</name>
+    <t>
+	<xref target="IEEEstd8021">IEEE Std. 802.1</xref> Ethernet Bridging
+	provides an efficient and reliable broadcast service for wired networks;
+    applications and protocols have been built that heavily depend on that
+    feature for their core operation.
+    Unfortunately, Low-Power Lossy Networks (LLNs) and Wireless Local Area
+    Networks (WLANs) generally do not benefit from the same reliable and cheap
+    broadcast capabilities as Ethernet links.
+    </t>
+    <t>
+    Similarly, the use of broadcast is discouraged on large scale virtual
+    networks that are overlaid over distributed physical locations as meshes
+    of point-to-point (P2P) links, as it represents massive amounts of
+    replication.
+    All in all, as IPv6 Links migrate from a physical wire to virtual or
+    intangible media, modern networks exhibit the common requirement to decouple
+    physical properties such as broadcast capabilities and transitivity that are
+    perceived and handled at the lower layers from the abstractions that are
+    manipulated at the IP layer.
+    </t>
+    <t>
+    This document presents an architecture for IPv6 over modern Non-Broadcast /
+    Non-Transitive networks that decouples the lower-layer concepts of links and
+    broadcast domains from the IP concepts of Links and Subnets. A study of the
+    issues with classical ND over wireless media is presented, and a framework
+    to solve those issues within the new architecture is proposed.
+    </t>
+
+
+   </section><!--Introduction-->
+
+   <section anchor="NDIssues"> <name>Issues with IPv6 ND-Based Access</name>
+
+
+
+     <section anchor='nd' > <name>ND-Classic and ND-Proxies</name>
+    <t>
+    Though ND-Classic was the state of the art when designed for an Ethernet wire
+    at the end of the twentieth century, it must be reevaluated for the new
+    technologies, such as wireless and overlays, that evolved since then.
+    In particular, relying on broadcast operation may be inefficient (too many
+    replications over constrained links), unreliable (broadcast may be lost in
+    transmission), detrimental to network operations (broadcast storms), prone
+    to multiplication attacks (a unicast from the outside may cause a broadcast
+    inside), and detrimental to privacy (an observer inside the network may
+    listen to broadcasts and learn more than it needs for its own operation).
+
+    </t>
+
+    <t>
+	The IPv6 ND Neighbor Solicitation (NS) <xref target="RFC4861"/> message
+	is used as a multicast IP packet for Address Resolution (AR) and Duplicate
+    Address Detection (DAD) <xref target="RFC4862"/>.
+    In those cases, the NS message is sent at the Network Layer to a
+	Solicited-Node Multicast Address (SNMA) <xref target="RFC4291"/> and should
+    in theory only reach a very small group of nodes.
+    It is intended for one Target, that may or may not be present in the network,
+    but it is often turned into a MAC-Layer broadcast and effectively reaches most
+    of the nodes that are attached to the layer 2 link.
+    </t>
+    <t>
+    DAD was designed for the efficient broadcast operation of Ethernet.
+    Experiments show that DAD often fails to discover the duplication of IPv6
+    addresses in large wireless access networks
+    <xref target="I-D.yourtchenko-6man-dad-issues"/>. In practice, IPv6
+    addresses very rarely conflict, not because the address duplications are
+    detected and resolved by the DAD operation, but thanks to the entropy of
+    the 64-bit Interface IDs (IIDs) that makes a collision quasi-impossible for
+    randomized IIDs.
+    </t>
+    <t>Arguably, IPv6 ND brought the support if multicast that should have reduced the broadcast traffic for DAD and AR, but in practice IPv6 ND multicast messages are mapped to link-layer broadcast on Ethernet and Wireless networks, and replication on overlays. The multicast model to Solicited Node Multicast Addresses (SNMA) probably does not make much economical sense either, since it would mean close to one state per address is every switch (there's usually only one address with the same SNMA, though the birthday paradox applies) when a complete ND cache would require only one state in every router, and there are typically far less routers than switches in the subnet.
+   </t>
+    <t>
+    Multicast NS transmissions may occur when a node joins the
+    network, moves, or wakes up and reconnects to the network.
+    Over a very large fabric, this can generate hundreds
+    of broadcasts per second. If the broadcasts were blindly copied over Wi-Fi,
+    the MAC-layer broadcast traffic associated to ND IP-layer multicast could
+    consume enough bandwidth to cause a substantial degradation to the unicast service
+    <xref target="I-D.vyncke-6man-mcast-not-efficient"/>.
+    To protect their bandwidth, some networks throttle ND-related broadcasts,
+    which reduces the capability for the ND protocol to operate as expected.
+    </t>
+    <t>
+    The IPv6 ND Neighbor Advertisement (NA) <xref target="RFC4861"/> message
+    can also be sent multicast, as a gratuitous information that can be
+    used to override the neighbor cache entries (NCEs) in all nodes with the
+    Link Layer Address (LLA) of the sender.
+    </t>
+    <t>
+    This problem can be alleviated by reducing the size of the broadcast domain
+    that encompasses wireless access links. This has been done in the art of IP
+    subnetting by partitioning the subnets and by routing between them, at the
+    extreme by assigning a /64 prefix to each wireless node
+    (see <xref target="RFC8273"/>).
+    </t>
+    <t>
+	Another way to split the broadcast domain within a subnet is to proxy at the
+    boundary of the wired and wireless domains the Network Layer protocols that
+    rely on link-layer broadcast operations.
+    <xref target="IEEEstd80211"/>
+	recommends deploying proxies for the IPv4 Address Resolution Protocol (ARP) and IPv6 ND at the APs.
+    This requires the exhaustive list of the IP addresses for which proxying is provided. Forming and maintaining that knowledge is a hard problem in the general case of radio connectivity, which keeps changing with movements and variations in the environment that alter the range of transmissions.
+    </t>
+    <t>
+    <xref target="I-D.bi-savi-wlan"/> suggests discovering the addresses by snooping the ND-Classic protocol, but that can also be unreliable. An IPv6 address may not be discovered immediately due to a packet loss. It may never be discovered in the case of a "silent" node that is not currently using one of its addresses, e.g., a printer that waits in wake-on-lan state.  A change of anchor, e.g. due to a movement, may be missed or misordered, leading to unreliable connectivity and an incomplete list of addresses.
+    </t>
+
+     </section > <!--ND-Classic, Wireless ND and ND-Proxies-->
+
+   <section anchor="wirelessIssues"> <name>The case of Wireless</name>
+    <t>
+    As opposed to unicast transmissions, the broadcast transmissions over
+    wireless links are not subject to automatic retries (ARQ) and can be very
+    unreliable. Reducing the speed at the physical (PHY) layer for broadcast transmissions can increase the reliability, at the expense of a higher
+    relative cost of broadcast on the overall available bandwidth.
+    As a result, protocols designed for bridged networks that rely on broadcast
+    transmissions often exhibit disappointing behaviors when employed
+    unmodified on a local wireless medium (see
+	<xref target="I-D.ietf-mboned-ieee802-mcast-problems"/>).
+    </t>
+
+    <t>
+    Like Transparent Bridging, the IPv6 <xref target="RFC8200"/> Neighbor
+    Discovery <xref target="RFC4861"/> <xref target="RFC4862"/> Protocol
+    (ND-Classic) is reactive, and relies on reactive Network Layer multicast for AR to
+    locate an on-link correspondent and DAD to ensure the
+    uniqueness of an IPv6 address in the case of Stateless Address Autoconfiguration (SLAAC).
+    On Ethernet LANs and most WLANs and Low-Power
+    Personal Area Networks (LoWPANs), the Network Layer multicast operation is
+    typically implemented as a link-layer broadcast for the lack
+    of an adapted and scalable link-layer multicast operation.
+    <!--
+    That link-layer multicast
+    operation would need  to handle a possibly very large number of groups and
+    it was easier to simply broadcast all the Network Layer multicast packets.
+    -->
+    </t>
+    <t>
+    It results that on wireless, an ND-Classic multicast message is typically broadcasted.
+    So even though there are very few nodes subscribed to the Network Layer multicast group, and there is at most one intended Target, the broadcast is received by many wireless nodes over the whole subnet (e.g., the ESS fabric).
+    And yet, the broadcast transmission being unreliable, the intended Target may effectively have missed the packet.
+    </t>
+    <t>
+    On paper, a Wi-Fi station must keep its radio turned on to listen to the
+    periodic series of broadcast frames, which for the most part will be dropped
+    when they reach Network Layer. In order to avoid this waste of energy and
+    increase its battery life, a typical battery-operated device such as an IoT
+    sensor or a smartphone will blindly ignore a ratio of the broadcasts, making
+    ND-Classic operations even less reliable.
+    </t>
+    <t>
+    <xref target="IEEEstd80211">Wi-Fi</xref> Access Points (APs) deployed in an Extended Service Set (ESS) act as <xref target="IEEEstd8021"/> bridges between the wireless stations (STA) and the wired backbone.
+    As opposed to the classical Transparent (aka Learning) Bridge operation that installs the forwarding state reactively to traffic, the bridging state in the AP is established proactively, at the time of association.
+    This protects the wireless medium against broadcast-intensive Transparent
+    Bridging lookups. The association process registers the link-layer (MAC)
+    Address (LLA) of the STA to the AP proactively, i.e., before it is needed.
+    The AP maintains the list of the associated addresses and blocks
+    the lookups for destinations that are not registered.
+    This solves the broadcast issue for the link-layer lookups, but the Network Layer problem remains.
+    </t>
+
+
+   </section> <!-- "The case of Wireless" -->
+
+   <section anchor="overlayIssues"> <name>The case of Overlays</name>
+   <t>
+    Layer-2 Overlays (VLANs) reduce the broadcast domain from the physical one, whereas Layer-3 overlays (e.g., VxLAN) can extend the Subnet beyond the limits of the physical network, enabling to deploy a Subnet over large physical domains. Layer-3 overlays are a clear indication of the need to decouple the Subnet from the limits of physical network.
+   </t>
+   <t>
+    A Layer-3 overlay is typically a partial or full mesh of point to point tunnel connections between routers. In case of a full mesh, a BUM (Broadcast, Unknown, and Multicast) forwarding over the overly can be implemented as ingress replication, which becomes detrimental to the operation of the ingress router as the overlay grows in number. This can be optimized in multisite operations so only one copy flies across sites in Data Center Interconnect (DCI) environments. Still, BUM processing is costly as it spreads across all sites that the overlay spans, and its use should be limited to operations where a real broadcast operation is desired, e.g., every node is interested in receiving the packet.
+   </t>
+   <t>
+   As discussed in <xref target="wirelessIssues"/>, multicast IPv6 ND messages are in fact broadcasted over the network, meaning that in the case of an overlay, they contribute to the BUM traffic as full broadcast. While a broadcast IPv6 ND RA message may be of interest within a site or a subsite to all local nodes, it is probably of little interest to other sites that are served by other routers, even when the overlay spans across both sites. The same goes for a local printer, the broadcast mDNS lookup should reach local printers but not faraway ones. This is another indication of the need to decouple the span of the Subnet from the lower layer broadcast domain.
+   </t>
+   <t>
+   Broadcast IPv6 ND NS messages used for lookup and DAD intend to reach at most one node. When those messages is used over the fabric and the target is a silent node, which location is unknown to the fabric, either the NS message is broadcasted, or the packet is lost, meaning that the silent node will not be reachable again until it provides its own sign of life. Using a BUM transmission that reaches every nodes to communicate with at most one is a misuse of the overlay resources and should be replaced by unicast-based methods.
+   </t>
+   <t>
+   In data centers, overlays are typically combined with multihoming at the edge. An advanced Network Interface Card (NIC) is equipped with more than one physical adapter (typically Ethernet) for redundancy, and the physical adapters connect to different leaf switches (aka ToR) to the same cloud network. The server (say, using Kubernetes) needs a single address and would rather use that address on both ports to the same Subnet, and use either adapter for its own reasons, e.g., load balancing, independently of IP addressing considerations. This means that the Interface abstraction that the server needs is a logical construct, decoupled from the physical adapters, and capable to encompass more than one.
+   </t>
+   </section> <!-- "The case of Overlays" -->
+
+   <section anchor="powerIssues"> <name>Power and Sustainability</name>
+   <t>
+   Misusing broadcast entails extraneous power consumption in any switched or wireless environment.
+   In the wireless case, broadcasts are sent at the slowest speed available in order to maximize the chances that all nodes in the BSS will receive the frame; not only does this consume more precious bandwidth than anycast transmission and generate interferes which may cascade in losses and retries in adjacent networks, this also means that power is consumed for a longer time (can be hundred time more) than for unicast.
+   Power is also wasted when replicating a packet to span an overlay. In all cases, to make the internet greener, we must reconsider the use of broadcast over large access networks. To maintain the capability to build the Subnets we want, this means that we must decouple the Subnet from the broadcast domain, make the broadcast domain small and local, and refocus the use of broadcast to the cases where all nodes are interested.
+   </t>
+   <t>
+   Constrained IoT devices conserve their power by placing themselves in deep sleep for most of the time. While a device is sleeping, it cannot answer IPv6 ND messages for AR and DAD. This makes IPv6 ND unsuitable to IoT devices. The 6LoWPAN WG has determined that the most appropriate model for a constrained network is a pull model where the device wakes up, negotiates with its router(s) for addresses and connectivity for some amount of time in the future, and goes back to sleep. The router can then perform a role of sleep proxy that defends the address(es) and holds traffic for the device till the device wakes up and pulls it from the router. Additionally, when the constrained network grows into a mesh, broadcast operations become rapidly inacceptable in terms of power and bandwidth, and the not-only model whereby for the most part hosts do not lookup one another, is mandatory.
+   </t>
+   </section> <!-- "Power and Sustainability" -->
+
+   <section anchor="securityIssues"> <name>Security and Privacy</name>
+   <t>
+   Broadcasting NS and NA messages exposes to the source to the whole network, including nodes that do not need to know that the source is present on the network. A passive listener my learn a lot on the presence of others and the source has no control over that. A more private approach has each node see and connect to only a subset of the routers using the not-onlink model, leaving the source the capability to shortcut to the destination based on redirect messages from the router, provided that the source wishes to do so.
+   </t>
+   <t>
+   Once it has discovered the presence of neighbor addresses, it becomes easy for the onlink attacker to impersonate any host in the network, either by sourcing packets with a stolen address, or by overriding the neighbor caches with a NA that indicates the attacker's LLA. It is thus desirable to avoid exposing the host IPv6 address in broadcast ND messages. Additionally, it is desirable that only the address owner can source packets with that address, and that another party may not claim and obtain that address.
+   </t>
+   <t>
+   The reactive NS lookup method can also be leveraged from the outside of the network to perform DOS attacks on constrained resources. The attacker just needs to forge any random address from the subnet prefix and send the packet. The Subnet ingress router will have to store that packet for the duration of the lookup time, and broadcast an NS to lookup the fake address. This both locks memory in the router and consumes bandwidth in the Subnet.
+   </t>
+   <t>
+   To avoid the lookup delays and associated attacks, it makes sense to use a proactive method whereby the router knows all the address mappings in advance, so that if the destination address is not present in the router tables, then the destination does not exist in the network and the packet can safely be dropped by the forwarding engine.
+  </t>
+   </section> <!-- "Security and Privacy" -->
+
+   <section anchor="mbIssues"> <name>More Middleboxes</name>
+   <t>
+   The above problems have been observed for at least since ealy 2000s. A number of actions were taken. For instance, IEEE std 802.11 <xref target="IEEEstd80211"/> mandates the support of a middlebox operation called "ARP proxy" for IPv4 and IPv6 in the Access Point (AP) that cancels broadcasts over a BSS when the IP target of the ARP/ND message is not associated to the AP. With IPv4, the expectation is that the STA owns one address, and that the address is obtained via DHCP right after the association, so it is pretty easy to snoop the address in the DHCP exchange (as long as it remains in the clear) and cancel undesirable ARP lookups.
+   </t>
+   <t>
+   In contrast to IPv4, IPv6 enables a node to form multiple addresses, some of them temporary and with a particular attention paid to privacy. Addresses may be formed and deprecated asynchronously to the association. Even if the knowledge of IPv6 addresses used by a STA can be obtained by snooping protocols such as IPv6 ND and DHCPv6, or by observing data traffic sourced at the STA, such methods provide only an imperfect knowledge of the state of the STA at the AP. This may result in a loss of connectivity for some IPv6 addresses, in particular for addresses rarely used and in a situation of mobility. This may also result in undesirable state persistence in the AP when a STA ceases to use an IPv6 address. It follows that snooping protocols is not a recommended technique and that it should only be used as last resort.
+   </t>
+   <t>
+   Because IPv6 ND is so easy to attack, some vendors have deployed undocumented proprietary counter measures as middlebox operation in the switches and routers. Those middleboxes snoop the ND protocol messages, filter them or modify them, for instance to change their scope from multicast to unicast. Based on the snooped information, the middlebox may for instance drop an RA message that appears to be coming from a host (e.g., as inferred because it arrives on a wireless interface), or an NA message that appears to be coming from a device that does not appear to be the owner. But, for the lack of an explicit contract between the host and the middlebox, the middlebox cannot determine who the earl owner is, and it may reject the rightful owner.
+   </t>
+   <t>
+   The middlebox may also block SLAAC from a host above a fixed number of addresses, to protect the network resources (addresses are an expensive and thus limited resource in a managed network) unbeknownst to the host. When that happens, the host believes that it can use the address but fails to connect with it. This might happen even if the host has ceased to use other addresses and is now within the quota, because ND lacks a method for the host to know how many addresses it can own, and for the router to know which addresses the host uses at any point of time. The infrastructure needs a deterministic knowledge of the addresses in use, and for that a contract must be passed between the host and the network to ensure that the addresses are usable.
+   </t>
+   <t>
+   Maybe the most insidious side effect of those middleboxes is that as opposed to NAT, they are obfuscated and proprietary. From one vendor to the next, and one product generation to the next, their behavior may evolve and affect the ND protocol in different fashions. In the short term, this may only impact some specific deployments, which may have to work around the issues. But worse than that, this may affect the future and the capability we have to evolve the protocols, like firewalls impact our capability to develop new transports in parallel to TCP and UDP. We must either standardize (e.g., for ND proxy) or eliminate those middlebox activities, and for that, the IPv6 ND protocol must evolve to a model where the middleboxes are not needed anymore. This means that we need a model that minimizes the use of broadcasts, and where a contract provides mutual guarantees for the host that need IPv6 addresses and the routers that provide reachability and protection for these addresses.
+   </t>
+   </section> <!-- "More Middleboxes" -->
+
+   <section anchor="summaryIssues"> <name>Summary of Issues</name>
+   <t>
+   IPv6 ND inherited 2 majors design points from IPv4, a strong coupling of logical and physical concepts, which creates unacceptable constraints on modern deployments with virtual and intangible links, and a reactive operation for AR and DAD that requires an extensive use of broadcast. While IPv4 and IPv6 behaviors are similar for addresses obtained via DHCP, the cost of AR and DAD makes IPv6 significantly more expensive with Stateless Address Autoconfiguration (SLAAC) is used.
+      </t>
+   <t>
+   And while IPv4 supported NBMA and P2MP models (e.g., on Frame Relay leveraging OSPFv2), the IPv6 promise to support NBMA (for ATM) remained unmet to this day, and only P2P and Transit links are properly supported by IPv6 ND. For those reasons, IPv6 with SLAAC can be significantly less attractive than IPv4 to some network administrators.
+   </t>
+   <t>
+   IPv6 ND exposes all addresses to all nodes in the network, which is unfit for privacy. It is prone to DOS attacks from outside the network and impersonation attacks from the inside, with no method to prove the address ownership and perform Source Address Validation (SAVI) later on the data traffic. To protect against such threats, the vendors had to introduce middleboxes that interfere with the protocol operation and affect the capability to evolve the protocol in the future.
+   </t>
+   <t>IPv6 ND lack a support for mobility (which typically entails a sequence counter maintained by the host and the deprecation of state that is based on older sequences) and for anycast. This makes it very hard for the network to defend the addresses on behalf of the owner, e.g., when the owner is temporarily disconnected. It results that the operation of the middleboxes is unsatisfactory and may cause discontinuities in connectivity.
+   </t>
+   <t>
+   The broadcast operation is not only detrimental to bandwidth, it is also an issue for energy conservation and sustainability. Devices must be always attached and always powered on to answer lookups and DADs, which makes IPv6 ND unapplicable to constrained IoT devices that sleep for the vast majority of their time.
+   The key design points in this architecture derive from the original observations made at the 6LoWPAN WG, and focus on avoiding waste of constrained resources such as spectrum and energy, by using broadcasts only when broadcast is really needed, and decoupling the IP abstraction of a Subnet from the broadcast domains.
+   </t>
+   </section> <!-- "Summary of Issues" -->
+
+</section><!-- "Issues with Classical IPv6 Access" -->
+
+
+<section anchor="NBNTArchi"> <name>An Architecture for IPv6 over Non-Broadcast Networks</name>
+
+
+
+<section anchor="NBNTArchiIntr"> <name>Basic Concepts</name>
+
+
+
+    <t>
+    This document introduces a new architecture to IPv6 Neighbor Discovery that is designed to apply to the WLANs and LoWPANs types of networks, as well as other Non-Broadcast Multi-Access (NBMA) networks such as Data-Center overlays and more generally as a replacement to the classical IPv6 ND in any network where the issues discussed in <xref target="NDIssues"/> are detrimental to the network operation.
+    The architecture leverages the not-onlink model and routing inside the subnet, which enables to form potentially large MLSNs without creating a large broadcast domain at the link-layer.
+    </t>
+    <t>
+    To support the deployment agility that virtual (e.g., VxLAN overlays and pseudowires) and intangible (e.g., wireless, laser, and quantum) links enable, the IP abstractions of Interface, Link, and Subnet are decoupled from their classical physical counterparts of interface, link, and broadcast domains. The Subnet is defined by a /64 prefix, as the longest aggregation that can be advertised in the IGP with the outside. Host routes and longer prefixes are advertised inside the Subnet only, using a separate Subnet Gateway protocol.
+    </t>
+    <t>
+    Any device that owns an address within the Subnet prefix belongs to the subnet, this is now decoupled from the physical connectivity and broadcast domain. Instead, the IPv6 routers that serve a Subnet must form a connected dominating set such that every host in the Subnet is connected to at least one router and the routers are connected to one another directly (classical NBMA, aka full mesh) or indirectly via other routers (Point to MultiPoint, P2MP, aka partial mesh). The not-onlink model is used throughout, so hosts do not look each other up, saving all the associated broadcast. Instead, they rely on the routers to forward the packets inside and outside the Subnet. This way, the Subnet can have any structure needed for the deployment, where hosts can move from router to router in the Subnet, or anywhere in the Internet provided they can lay a mobility tunnel to one of the routers for use as IP Link to the Subnet.
+    </t>
+    <t>All IP links are abstracted as Point-to-Point, though a lower-layer broadcast service may be used by the router to send RAs to a subset of local hosts in the subnet, or by the host to send an RS message to a subset of the routers. An IP Interface bundles one or more subInterfaces, one per Subnet that can be reached through that Interface. A Global IPv6 address is installed on the subInterface that connects to the Subnet from which the address derives. The IP Interface connects to one or more IP Links (to different neighbors) over the same or over different physical interfaces (they are decoupled). A Link-Local Address is associated to the IP Link directly. Each SubInterface connects to the subset of those IP Links that reach other nodes in the Subnet.
+    </t>
+    <t>
+    In a fashion similar to a Wi-Fi Association, IPv6 Hosts register their addresses to their serving router(s), which may reject the registration, e.g., in case of a duplication. To support distributed routers in the Subnet, an abstract registrar service maintains the state of all active registrations in the Subnet and answers queries to lookup mappings, validate ownership, and avoid duplications. The registration is abstract to the routing service and the registrar service, and it can be protected to prevent impersonation attacks.
+    The registration enables the network to know deterministically all the IPv6 addresses and LLA mapping currently in use, and eliminates the need for lookups and DAD, and for the associated broadcasts.
+    </t>
+    <t>
+    With the registration, the routers have a complete knowledge of the hosts they serve and in return, hosts obtain routing services for their registered addresses.
+    The abstract routing service allows an ingress router to find a path to the destination address within the subnet. It can be a simple reflection in a Hub-and-Spoke subnet that emulates an IEEE Std. 802.11 Infrastructure BSS at the Network Layer. It can also be a full-fledge routing protocol, e.g., RPL, which is designed to adapt to various LLNs such as WLAN and WPAN radio meshes, see <xref target="RFC9010"/> for more, or BGP/EVPN, for application in data centers, see <xref target="RFC8365"/> for more. It can be based on overlay tunnels between ingress router and egress router leveraging a resolver service such as LISP, see <xref target="RFC7834"/> for more.
+    Finally, the routing service can also be an ND proxy that emulates an IEEE Std. 802.11 Infrastructure ESS at the Network Layer, as specified in the IPv6 Backbone Router <xref target="RFC8929"/>.
+    </t>
+    <t>The abstract registrar service maintains the mapping between the registered node link-layer address and the registered IPv6 address. It contains meta data that enables to ascertain that the second registration for the same address is performed for the same registered node, so it also binds the registered node with the registered IPv6 address. The registrar service provides APIs to look up a link-layer address for an IPv6 address as well as validate IPv6 address ownership. The registrar can be implemented as a mapping server ala LISP, a distributed state ala ND proxy, or a synchronized state ala EVPN. In the former case, this enables the reactive lookups to be performed as unicast requests to the map resolver. In the latter, the address mapping is synchronized by the routing protocol and known to all the routers for all nodes in the IP Subnet, so there is never a need for a reactive lookup.
+    </t>
+    <t>
+    On the one hand, the Architecture proposed in this document avoids the use of broadcast operation for DAD and AR, and on the other hand, it supports use cases where subnet and link-layer domains are not congruent, which is common in wireless networks unless a specific link-layer emulation is provided.
+    </t>
+    <t>
+    The address registration provides a contractual interface between the nodes and the routers where nodes can ask for addresses which will be guaranteed to be operational for a contractual lifetime, and the network may accept or refuse granting additional addresses based on state (e.g., duplicate address) as well as policy (e.g., quota). This ways hosts and routers agree deterministically on which addresses will be served to which nodes in the Subnet. That interface is agnostic to the router to router and router to registrar. The latter interfaces can be implemented in various fashions that can blend in existing technologies such as legacy IPv6 ND network through ND proxy, EVPN- and LISP-based overlays.
+    </t>
+
+</section><!-- "Basic Concepts" -->
+
+     <section anchor='terms' > <name>Terminology</name>
+
+   <section anchor='linkdef' > <name>IP Links </name>
+<t>For a long time, the term link has been used to refer to the layer 2 communication
+medium that can be leveraged at layer 3 to instantiate one IP hop. In this document
+we conserve that term but differentiate it from an IP link, which is a layer 3
+abstraction that represents the layer 2 link but is not the layer 2 link, like the
+map is not the country.
+</t>
+<t>
+With IPv6, IP has moved to layer 3 abstractions for its operations, e.g., with
+the use of link local address (LLA), and that of IP multicast for link-scoped
+operations. At the same time, the concept of an IP link emerged as an abstraction
+that represents how IP layer considers the layer 2 link:
+</t>
+<ul>
+<li>An IP link connects an IP node to one or more other IP nodes using a lower layer subnetwork.
+The lower layer subnetwork may comprise multiple lower layer links, e.g., in the case of a switched fabric or a mesh-under LLN.
+</li>
+<li>an IP link defines the scope of an LLA, and defines the domain in which the
+LLA must be unique</li>
+<li>an IP link provides a subset of the connectivity that is offered by the
+lower layer; if the IP link is narrower than the layer 2 reachable domain, then
+layer 3 filters must restrict the link-scoped communication to remain between
+peers on a same IP link, and more than one IP link may be installed on the same
+physical interface to connect to different peers.
+</li>
+<li>an IP link can be Point to Point (P2P), Point to Point (P2MP, forming a partial mesh), NBMA (non-broadcast multi-access, fully meshed), or transit (broadcast-capable and any-to-any).
+</li>
+
+</ul>
+<t>It is a network design decision to use one IP link model or another over a given lower layer network, e.g., to map a Frame Relay network as a P2MP IP link, or as a collection of P2P IP links. As another example, an Ethernet fabric may be bridged, in which case the nodes that interconnect the layer 2 links are L2 switches, and the fabric can be abstracted as a single transit IP link; or the fabric can be routed, in which case the P2P IP links are congruent with the layer 2 links, and the nodes that interconnect the links are routers.
+</t>
+<t> This architecture only uses P2P Link abstractions.
+A physical interface may enable to reach to more than one peer at layer 2.
+In that case, this architecture maps each peer relationship as a different IP Link.
+A Link Local Address only needs to be unique within that peer to peer relationship.
+</t>
+
+<figure anchor='figLink'><name>Link Abstraction</name>
+ <artwork><![CDATA[
+
+    +--------------------
+    |
+    |   IP Link 1 ---------------------------> Node 1
+    |   IP Link 2 ---------------------------> Node 2
+    |                ...
+    |   IP Link N ---------------------------> Node N
+    |
+    +--------------------
+      Physical Interface
+
+
+]]></artwork>
+</figure>
+<t>
+If the Link-Layer address of the peer is not visible from the IP layer when processing a message, then the IP layer cannot discriminate the IP Link of packets arriving on the same interface, and for that reason, it will reject a second registration for the same Link Local Address by a second host, meaning that a Link Local Address will have to be unique on a physical interface across IP Links.= that this interface connects to. In that case, the Link Local Address of the peer is used to recognize the IP Link, and all addresses registered with the same Link Local Address will be associated to the that IP Link.
+</t>
+
+     </section><!-- IP Links -->
+   <section anchor='intfdef' > <name>IP Interfaces</name>
+   <t>As is the case for links, the term interface has been historically confused between the physical object that provides physical connectivity and the IP layer logical object that connects the host with the IP Link:
+
+   </t>
+   <ul>
+   <li>
+   <t>
+   an IP Interface is an abstraction that connects the host with a collection of IP Links (for the purpose of link local communication) and bundles the interfaces for each IP Subnet in subInterfaces. The host installs at least one link-local address on an IP Interface for each IP Link that is connected through that interface, and one subInterface per Subnet. The same Link-Local address may be reused over different IP Links as long as it is not a collision for the peer on that IP Link. Similarly, the host installs at least one global (or unique local as appropriate) address on an IP subInterface for the associated Subnet, and the address is advertised over each IP Link in the Subnet.
+</t>
+   </li>
+
+   <li>
+   an IP Interface can be P2P, in which case it connects to a single IP Link, or P2MP, in which case it aggregates multiple IP Links. In a multihomed host, a single IP Interface can be installed to connect to the IP Links associated to different physical interfaces, in which case the same IPv6 address may be advertised on more than one physical interface. Conversely, when more than one Subnet is reachable over a physical interface, more than one IP Interface may leverage that physical interface for transmission.
+   </li>
+   </ul>
+
+     </section><!-- IP Interfaces -->
+   <section anchor='subdef' > <name>IP Subnets</name>
+<t>IPv6 builds another abstraction, the IP subnet, over one shared IP link or over a collection IP links, forming a MLSN in the latter case. An MLSN is formed over IP links (e.g., P2P or P2MP) that are interconnected by routers that either inject hosts routes in an IGP, in which case the topology can be anything, or perform ND proxy operations, in which case the structure of links must be strictly hierarchical to avoid loops.
+</t>
+<t><xref target="RFC8929"/> defines bridging and routing IPv6 ND proxies.
+Both forms of ND proxies interconnect IP links and enable to isolate the layer 2
+broadcast domains. But in the case of a bridging proxy, the layer 2 unicast
+communication can still exist between the layer 2 domains that are covered by
+the layer 3 links, whereas in the base of a routing proxy, they are isolated, and
+packets must be routed back and forth. Bridging proxies are possible between
+compatible technologies and translational bridges (e.g., Wi-Fi to Ethernet),
+whereas routing proxies are required between non-bridgeable technologies and
+desirable to avoid exposing the layer 2 addresses across, e.g., for reasons of
+stability and scalability.
+</t>
+<t>It is another network design decision to use one IP subnet model or another over a given lower layer network. A switched fabric can host one or more IP subnets, in which case the IP links can reach all and beyond one subnet. On the other hand, a subnet can encompass a collection of links; in that case, the scope of the link local addresses, which is the IP Link, is narrower than the span of the subnet.
+</t>
+<t>A subnet prefix is associated with the IP subnet, and a node is a member of an IP
+subnet when it has an IP address that derives from that prefix. The IP address is
+either a Unique Local (ULA) or a Global Unicast Address (GUA), and as opposed to
+ the case of LLAs, the scope of the address is not limited to the IP subnet.
+</t>
+<t>
+The switched and routed fabric above could be the exact same network of physical links and boxes, what changes is the way the networking abstractions are mapped onto the system, and the implication of such decision include the capability to reach another node at layer-2, and the size of the broadcast domain and related broadcast storms.
+</t>
+
+     </section><!-- IP Subnets -->
+
+
+     <section anchor='sgp' > <name>Subnet Gateway Protocols</name>
+     <t>
+     The /64 boundary creates a wall between the traditional Interior Gateway Protocols (IGP) that operate between Subnets and manipulate shorter than 64 prefixes, and Subnet Gateway Protocols (SGP) that  operate inside a Subnet and manipulate shorter than 64 prefixes, typically /128 host routes, and possibly more specific data like Link-Layer Address mappings and Address Proof of Ownership.
+     </t>
+     <t>As opposed to classical IGPs, an SGP must support rapid mobility of addresses to cope with wireless devices and virtual machines mobility. In that regard, an SGP operates mores as a MANET protocol than as a classical IGP. Ideally, there should be no stale route, and no microloop. A classical method in MANETs to achieve this is to sequence the movements and advertise the sequence in the routing protocol, so only routes with the most recent sequence can be followed, and once a packet starts following a route with a certain sequence, it must be discarded rather to have to follow a path with an older sequence. To support this approach, the node that registers an address must be the owner of a mobility sequence number and update that sequence when it moves.
+     </t>
+     <t>
+     Multihoming being a classical requirement in DC environments, the SGP must be able to differentiate not only address duplication from movement, but also from anycast addresses, which can be advertised from multiple places in a coordinated (same mobility sequence) or uncoordinated fashion. For unicast addresses, an token that identifies the address owner can be used for address duplication avoidance, and if that token is cryptographic, it can be used as registration ownership verifier as well.
+     </t>
+     </section><!-- Subnet Gateway Protocols -->
+
+
+     <section anchor='acronyms' > <name>Acronyms</name>
+    <t> This document uses the following abbreviations:
+    </t>
+       <dl spacing='compact'>
+       <dt>6BBR:</dt><dd>6LoWPAN Backbone Router </dd>
+       <dt>6LN:</dt><dd>6LoWPAN Node  </dd>
+       <dt>6LR:</dt><dd>6LoWPAN Router </dd>
+       <dt>ARO:</dt><dd>Address Registration Option</dd>
+       <dt>DAC:</dt><dd>Duplicate Address Confirmation </dd>
+       <dt>DAD:</dt><dd>Duplicate Address Detection </dd>
+       <dt>DAR:</dt><dd>Duplicate Address Request</dd>
+       <dt>EDAC:</dt><dd>Extended Duplicate Address Confirmation  </dd>
+       <dt>EDAR:</dt><dd>Extended Duplicate Address Request</dd>
+       <dt>MLSN:</dt><dd>Multi-link subnet </dd>
+       <dt>LLN:</dt><dd>Low-Power and Lossy Network </dd>
+       <dt>LoWPAN:</dt><dd>Low-Power Wireless Personal Area Network </dd>
+       <dt>NA:</dt><dd> Neighbor Advertisement </dd>
+       <dt>NBMA:</dt><dd> Non-Broadcast Multi-Access </dd>
+       <dt>NCE:</dt><dd> Neighbor Cache Entry  </dd>
+       <dt>ND:</dt><dd> Neighbor Discovery  </dd>
+       <dt>NDP:</dt><dd> Neighbor Discovery Protocol </dd>
+       <dt>NS:</dt><dd> Neighbor Solicitation  </dd>
+       <dt>RPL:</dt><dd>IPv6 Routing Protocol for LLNs  </dd>
+       <dt>RA:</dt><dd> Router Advertisement  </dd>
+       <dt>RS:</dt><dd> Router Solicitation  </dd>
+       <dt>SGP:</dt><dd> Subnet Gateway Protocol  </dd>
+       <dt>VLAN:</dt><dd>Virtual Local Area Network </dd>
+       <dt>WiND:</dt><dd>Wireless Neighbor Discovery </dd>
+       <dt>WLAN:</dt><dd>Wireless Local Area Network </dd>
+       <dt>WPAN:</dt><dd>Wireless Personal Area Network </dd>
+       </dl>
+
+     </section><!-- Acronyms -->
+
+
+     </section> <!-- Terminology -->
+
+        <section > <name>IP Models</name>
+
+
+   <section > <name>Physical Broadcast Domain</name>
+
+<t>
+At the physical (PHY) Layer, a broadcast domain is the set of nodes that may receive a transmission that one sends over an interface, in other words the set of nodes in range of the radio transmission. This set can comprise a single peer on a serial cable used as point-to-point link. It may also comprise multiple peer nodes on a broadcast radio or a shared physical resource such as the Ethernet wires and hubs for which ND-Classic was initially designed.
+</t>
+<t>
+On WLAN and LoWPAN radios, the physical broadcast domain is defined relative to a particular transmitter, as the set of nodes that can receive what this transmitter is sending. Literally every frame defines its own broadcast domain since the chances of reception of a given frame are statistical. In average and in stable conditions, the broadcast domain of a particular node can be still be seen as mostly constant and can be used to define a closure of nodes on which an upper Layer abstraction can be built.
+</t>
+<t>
+A PHY Layer communication can be established between two nodes if the physical broadcast domains of their unicast transmissions overlap.
+On WLAN and LoWPAN radios, that relation is usually not reflexive, since nodes disable the reception when they transmit; still they may retain a copy of the transmitted frame, so it can be seen as reflexive at the MAC Layer. It is often symmetric, meaning that if B can receive a frame from A, then A can receive a frame from B. But there can be asymmetries due to power levels, interferers near one of the receivers, or differences in the quality of the hardware (e.g., crystals, PAs and antennas) that may affect the balance to the point that the connectivity becomes mostly uni-directional, e.g., A to B but practically not B to A.
+</t>
+<t>
+It takes a particular effort to place a set of devices in a fashion that all their physical broadcast domains fully overlap, and that specific situation can not be assumed in the general case. In other words, the relation of radio connectivity is generally not transitive, meaning that A in range with B and B in range with C does not necessarily imply that A is in range with  C.
+</t>
+   </section> <!--Physical Broadcast Domain-->
+   <section > <name>link-layer Broadcast Emulations</name>
+
+<t>
+We call Direct MAC Broadcast (DMB) the transmission mode where the broadcast domain that is usable at the MAC layer is directly the physical broadcast domain. <xref target="IEEE802154">IEEE Std. 802.15.4</xref> and <xref target="IEEEstd80211">IEEE Std. 802.11</xref> OCB (for Out of the Context of a BSS) are examples of DMB radios. DMB networks provide mostly symmetric and non-transitive transmission. This contrasts with a number of link-layer Broadcast Emulation (LLBE) schemes that are described in this section.
+</t>
+<!--
+<t>
+In the absence of a link-layer emulation such as a Mesh-Under or an Infrastructure BSS, the link-layer broadcast domain is congruent with that of the PHY Layer and inherits its properties for symmetry and transitivity. The IEEE Std. 802.11 OCB, which operates without a BSS, is an example of a network that does not have a link-layer broadcast domain emulation, which means that it will exhibit mostly symmetric and mostly non-transitive transmission properties.
+</t>
+-->
+<t>
+In the case of Ethernet, while a physical broadcast domain is constrained to a single shared wire, the <xref target="IEEEstd8021">IEEE Std. 802.1</xref> bridging function emulates the broadcast properties of that wire over a whole physical mesh of Ethernet links. For the upper layer, the qualities of the shared wire are essentially conserved, with a reliable and cheap broadcast operation over a transitive closure of nodes defined by their connectivity to the emulated wire.
+</t>
+<t>
+In large switched fabrics, overlay techniques enable a limited connectivity between nodes that are known to a Map Resolver. The emulated broadcast domain is configured to the system, e.g., with a VXLAN network identifier (VNID). Broadcast operations on the overlay can be emulated but can become very expensive, and it makes sense to proactively install the relevant state in the mapping server as opposed to rely on reactive broadcast lookups to do so.
+</t>
+<t>
+An <xref target="IEEEstd80211">IEEE Std. 802.11</xref> Infrastructure Basic Service Set (BSS) also provides a transitive closure of nodes as defined by the broadcast domain of a central AP. The AP relays both unicast and broadcast packets and provides the symmetric and transitive emulation of a shared wire between the associated nodes, with the capability to signal link-up/link-down to the upper layer. Within a BSS, the physical broadcast domain of the AP serves as emulated broadcast domain for all the nodes that are associated to the AP. Broadcast packets are relayed by the AP and are not acknowledged.
+To increase the chances that all nodes in the BSS receive the broadcast transmission, AP transmits at the slowest PHY speed. This translates into maximum co-channel interferences for others and the longest occupancy of the medium, for a duration that can be a hundred times that of the unicast transmission of a frame of the same size.
+</t>
+<t>
+For that reason, upper layer protocols should tend to avoid the use of broadcast when operating over Wi-Fi.
+To cope with this problems, APs may implement strategies such as turn a broadcast into a series of unicast transmissions, or drop the message altogether, which may impact the upper layer protocols. For instance, some APs may not copy Router Solicitation (RS) messages under the assumption that there is no router across the wireless interface. This assumption may be correct at some point of time and may become incorrect in the future. Another strategy used in Wi-Fi APS is to proxy protocols that heavily rely on broadcast, such as the Address Resolution in ARP and ND-Classic, and either respond on behalf or preferably forward the broadcast frame as a unicast to the intended Target.
+</t>
+<t>
+In an <xref target="IEEEstd80211">IEEE Std. 802.11</xref> Infrastructure Extended Service Set (ESS), infrastructure BSSes are interconnected by a bridged network, typically running Transparent Bridging and the Spanning tree Protocol or a more advanced Layer 2 Routing (L2R) scheme. In the original model of learning bridges, the forwarding state is set by observing the source MAC address of the frames. When a state is missing for a destination MAC address, the frame is broadcasted with the expectation that the response will populate the state on the reverse path. This is a reactive operation, meaning that the state is populated reactively to the need to reach a destination.
+It is also possible in the original model to broadcast a gratuitous frame to advertise self throughout the bridged network, and that is also a broadcast.
+</t>
+<t>
+The process of the Wi-Fi association prepares a bridging state proactively at the AP, which avoids the need for a reactive broadcast lookup over the wireless access. In an ESS, the AP may also generate a gratuitous broadcast sourced at the MAC address of the STA to prepare or update the state in the learning bridges so they point towards the AP for the MAC address of the STA. WiND emulates that proactive method at the Network Layer for the operations of AR, DAD and ND proxy.
+</t>
+<t>
+In some instances of WLANs and LoWPANs, a Mesh-Under technology (e.g., a IEEE Std. 802.11s or IEEE Std. 802.15.10) provides meshing services that are similar to bridging, and the broadcast domain is well-defined by the membership of the mesh. Mesh-Under emulates a broadcast domain by flooding the broadcast packets at the link-layer. When operating on a single frequency, this operation is known to interfere with itself, and requires inter-frame gaps to dampen the collisions, which reduces further the amount of available bandwidth.
+</t>
+<t>
+As the cost of broadcast transmissions becomes increasingly expensive, there is a push to rethink the upper Layer protocols to reduce the dependency on broadcast operations.
+</t>
+
+
+   </section><!--link-layer Broadcast Emulations-->
+   <section > <name>Mapping the IPv6 link Abstraction</name>
+
+<t>As introduced in <xref target='linkdef'/>,
+IPv6 defines a concept of link, link scope and Link-Local Addresses (LLA), an LLA being unique and usable only within the Scope of a Link. The ND-Classic <xref target="RFC4861"/> DAD <xref target="RFC4862"/>  process uses a multicast transmission to detect a duplicate address, which requires that the owner of the address is connected to the link-layer broadcast domain of the sender.
+</t>
+<t>
+On a wired medium, the IP link is often confused with the physical broadcast domain because both are determined by the serial cable or the Ethernet shared wire. Ethernet Bridging reinforces that illusion with a link-layer broadcast domain that emulates a physical broadcast domain over the mesh of wires.
+
+But the difference shows on legacy P2MP and NBMA networks such as ATM and Frame-Relay, on shared links and on newer types of NBMA networks such as radio and composite radio-wires networks. It also shows when private VLANs or link-layer cryptography restrict the capability to read a frame to a subset of the connected nodes.
+</t>
+<t>
+In Mesh-Under and Infrastructure BSS, the IP link extends beyond the physical broadcast domain to the emulated link-layer broadcast domain. Relying on Multicast for the ND operation remains feasible but becomes highly detrimental to the unicast traffic, and becomes less and less energy-efficient and reliable as the network grows.
+</t>
+<t>
+On DMB radios, IP links between peers come and go as the individual physical broadcast domains of the transmitters meet and overlap. The DAD operation cannot provide once and for all guarantees over the broadcast domain defined by one radio transmitter if that transmitter keeps meeting new peers on the go.
+</t>
+<t>
+The scope on which the uniqueness of an LLA must be checked is each new pair of nodes for the duration of their conversation. As long as there's no conflict, a node may use the same LLA with multiple peers but it has to perform DAD again with each new peer. A node may need to form a new LLA to talk to a new peer, and multiple LLAs may be present in the same radio interface to talk to different peers. In practice, each pair of nodes defines a temporary P2P link, which can be modeled as a sub-interface of the radio interface.
+</t>
+<t>
+The DAD and AR procedures in ND-Classic expect that a node in a subnet is reachable within the broadcast domain of any other node in the subnet when that other node attempts to form an address that would be a duplicate or attempts to resolve the MAC address of this node. This is why ND is applicable for P2P and transit links, but requires extensions for more complex topologies.
+</t>
+
+   </section><!--Mapping the IPv6 link Abstraction-->
+   <section > <name>Mapping the IPv6 subnet Abstraction</name>
+
+<t>As introduced in <xref target='subdef'/>,
+IPv6 also defines the concept of a subnet for Global and Unique Local Addresses (GLA and ULA). All the addresses in a subnet share the same prefix, and by extension, a node belongs to a subnet if it has an address that derives from the prefix of the subnet. That address must be topologically correct, meaning that
+it must be installed on an interface that is connected to the subnet.
+</t>
+<t>
+Unless intently replicated in different locations for very specific purposes, a subnet prefix is unique within a routing system; for ULAs, the routing system is typically a limited domain, whereas for GLAs, it is the whole Internet.
+</t>
+<t>
+For that reason, it is sufficient to validate that an address that is formed from a subnet prefix is unique within the scope of that subnet to guarantee that it is globally unique within the whole routing system. Note that a subnet may become partitioned due to the loss of a wired or wireless link, so even that operation is not necessarily obvious, more in <xref target="I-D.nordmark-6man-dad-approaches"/>.
+
+
+</t>
+<t>
+The IPv6 aggregation model relies on the property that a packet from the outside of a subnet can be routed to any router that belongs to the subnet, and that this router will be able to either resolve the destination link-layer address and deliver the packet, or, in the case of an MLSN, route the packet to the destination within the subnet.
+</t>
+<t>
+
+If the subnet is known as on-link, then any node may also resolve the destination link-layer address and deliver the packet, but if the subnet is not on-link, then a host in the subnet that does not have a Neighbor Cache Entry (NCE) for the destination will also need to pass the packet to a router, more in <xref target="RFC5942"/>.
+</t>
+<t>
+On Ethernet, an IP subnet is often congruent with an IP link because both are determined by the physical attachment to a shared wire or an IEEE Std. 802.1 bridged domain. In that case, the connectivity over the IP link is both symmetric and transitive, the subnet can appear as on-link, and any node can resolve a destination MAC address of any other node directly using ND-Classic.
+</t>
+<t>
+But an IP link and an IP subnet are not always congruent. In the case of a Shared Link, individual subnets may each encompass only a subset of the nodes connected to the link. Conversely, in Route-Over Multi-link subnets (MLSN) <xref target="RFC4903"/>, routers federate the links between nodes that belong to the subnet, the subnet is not on-link and it extends beyond any of the federated links.
+</t>
+
+   </section><!--Mapping the IPv6 subnet Abstraction-->
+
+   </section> <!--IP Models-->
+
+   <section anchor='sfaacdef' > <name>Stateful Address Autoconfiguration and Subnet Routing</name>
+
+<t>
+This Architecture defines a new operation for ND that is based on 2 major paradigm changes, a proactive address registration by hosts to their attachment routers and routing to host routes (/128) within the subnet. This allows ND to avoid the expectations of transit links and subnet-wide broadcast domains.
+</t>
+<t>
+The proactive address registration, called Stateful Address Autoconfiguration (SFAAC) by opposition to SLAAC, is agnostic to the method used for Address Assignment, e.g., Manual, Semantically Opaque Autoconfiguration <xref target="RFC7217"/>, randomized <xref target="RFC8981"/>, or DHCPv6 <xref target="RFC8415"/>. It does not change the IPv6 addressing <xref target="RFC4291"/> or the current practices of assigning prefixes, typically a /64,  to a subnet.
+But the DAD operation is performed as a unicast exchange with the abstract egistrar service.
+</t>
+
+<t>
+This Architecture combines SFAAC with the not-onlink model on the IP Interfaces. Hosts do not expect the IP Subnet to be reachable over the L2 broadcast domain and rely on their routers to forward the packets inside and outside the Subnet. In turn, the router expose to each other all the IPv6 addresses that are either owned or registered to it as host routes over a Subnet Gateway Protocol, an IGP that is specialized in routing inside the subnet and can be decoupled with the routing protocol used between subnets.
+</t>
+   </section> <!-- "Stateful Address Autoconfiguration and Subnet Routing" -->
+
+</section> <!-- "An Architecture for IPv6 over Non-Broadcast Networks" -->
+
+
+
+   <section > <name>A Framework for Stateful Address Autoconfiguration and Subnet Routing </name>
+
+   <section anchor="int2" > <name>Implementing Stateful Address Autoconfiguration</name>
+
+
+<t>
+SFAAC was initially standardized for IoT and wireless links as <xref target="RFC6775"/>, <xref target="RFC8505"/>,  and <xref target="RFC8928"/>. A new option in NS/NA messages, the Extended Address Registration Option (EARO) signals that the Target Address is being registered and provides the registration parameters <xref target="RFC8505"/>. This method allows to prepare and maintain the host routes in the routers and avoids the reactive Address Resolution in ND-Classic and the associated link-layer broadcasts transmissions.
+</t>
+<t>
+The EARO provides information to the router that is independent to the routing protocol and routing can take multiple forms, from a traditional IGP to a collapsed Hub-and-Spoke model where only one router owns and advertises the prefix.  <xref target="RFC8505"/> is already referenced as the registration interface to <xref target="I-D.ietf-rift-rift">"RIFT: Routing in Fat Trees"</xref> and <xref target="RFC6550">"RPL: IPv6 Routing Protocol for Low-Power and Lossy Networks"</xref> with <xref target="RFC9010"/>.
+</t>
+
+<t>
+Wireless ND (WiND) is an example instantiation of the Architecture presented in <xref target="NBNTArchi"/>; it combines SFAAC with a Backbone Router (6BBR) ND proxy function (more in <xref target="RFC8929"/>) operating as a Layer-3 Access Point. Multiple 6BBRs placed along the wireless edge of a Backbone link handle IPv6 Neighbor Discovery and forward packets over the backbone on behalf of the registered nodes on the wireless edge.
+This enables to span a subnet over an MLSN that federates edge wireless links with a high-speed, typically Ethernet, backbone (as a Layer-3 ESS). The ND proxy maintains the reachability for Global Unicast and Link-Local Addresses within the federated MLSN, either as a routing proxy where it replies with its own MAC address or as a bridging proxy that typically forwards the multicast ND messages as unicast Layer-2 frames to their target. The wireless nodes can form any address they want and move freely from a wireless edge link to another, without renumbering.
+In that case, the registrar is distributed between the 6BBR, each 6BBR maintaining only a state for the subset of the addresses that were registered to it and for which it is authoritative. When the 6BBR is not currently authoritative for a new address being registererd to it, it relies on Classical ND that is used reactively over the backbone to obtain an existing registration state in
+
+</t>
+
+<t>
+This framework allows other implementations of the abstract concept of the registrar. For instance, <xref target="I-D.thubert-bess-secure-evpn-mac-signaling"/> allows to distribute the registrar in every router, and leverages EVPN as the method to synchronize the registrar state between routers. In that case, BGP acts both as the SGP to announce the reachability of the addresses and as the synchronization protocol between the distributed registrar. All the routers know proactively the mapping for all the addresses, and there is no need for a reactive lookup as is the case for WiND. As another example, a Locator/ID Separation Protocol (LISP) Map-Resolver <xref target="RFC6830"/> could support the EDAR/EDAC exchange either directly or via a proxy, and serve as registrar.
+</t>
+
+<t>The framework allows for mixed environments with registrations and classical ND, using <xref target="RFC8929"/> to perform ND proxy operations on behalf of registered address and respond to DAD and lookups from legacy nodes, and prevent registering nodes from autoconfiguring addresses that exist in legacy nodes by performing DAD on behalf of the registering nodes, more in <xref target='coex'/>.
+</t>
+
+
+   </section><!-- "Implementing Stateful Address Autoconfiguration" -->
+   <section > <name>links and Link-Local Addresses</name>
+<t>
+For Link-Local Addresses, DAD is typically performed between communicating pairs of nodes and an NCE can be populated with a single unicast exchange. In the case of a bridging proxies, though, the Link-Local traffic is bridged over the backbone and the DAD must proxied there as well.
+</t>
+<t>
+For instance, in the case of Bluetooth Low Energy (BLE) <xref target="RFC7668"/><xref target="IEEEstd802151"/>, the uniqueness of Link-Local Addresses needs only to be verified between the pair of communicating nodes, the central router and the peripheral host. In that example, 2 peripheral hosts connected to the same central router can not have the same Link-Local Address because the addresses would collision at the central router which could not talk to both over the same interface. The DAD operation from SFAAC is appropriate for that use case, but the one from ND is not, because the peripheral hosts are not on the same broadcast domain.
+</t>
+<t>
+On the other hand, the uniqueness of Global and Unique-Local Addresses is validated at the subnet Level, using a logical registrar that is global to the subnet.
+</t>
+
+   </section><!--SFAAC application to links and Link-Local Addresses-->
+
+
+   <section > <name>Subnets and Global Addresses</name>
+
+
+
+<t>
+SFAAC extends ND-Classic for Hub-and-Spoke (e.g., BLE) and Route-Over (e.g., RPL) Multi-link subnets (MLSNs).
+
+</t>
+<t>
+In the Hub-and-Spoke case, each Hub-Spoke pair is a distinct IP Link, and a subnet can be mapped on a collection of links that are connected to the Hub. The subnet prefix is associated to the Hub.
+
+</t>
+<t>
+Acting as a router, the Hub advertises the prefix as not-on-link to the spokes in RA messages Prefix Information Options (PIO). Acting as hosts, the Spokes autoconfigure addresses from that prefix and register them to the Hub with a corresponding lifetime.
+</t>
+<t>
+Acting as a registrar, the Hub maintains a binding table of all the registered IP addresses and rejects duplicate registrations, thus ensuring a DAD protection for a registered address even if the registering node is sleeping.
+</t>
+<t>
+The Hub also maintains an NCE for the registered addresses and can deliver a packet to any of them during their respective lifetimes. It can be observed that this design builds a form of Network Layer Infrastructure BSS.
+</t>
+<t>
+A Route-Over MLSN is considered as a collection of Hub-and-Spoke where the Hubs form a connected dominating set of the member nodes of the subnet, and IPv6 routing takes place between the Hubs within the subnet. A single logical registrar is deployed to serve the whole mesh.
+</t>
+<t>
+The registration in <xref target="RFC8505"/> is abstract to the routing protocol and provides enough information to feed a routing protocol such as RPL as specified in <xref target="RFC9010"/>. In a degraded mode, all the Hubs are connected to a same high speed backbone such as an Ethernet bridging domain where ND-Classic is operated. In that case, it is possible to federate the Hub, Spoke and Backbone nodes as a single subnet, operating ND proxy operations <xref target="RFC8929"/> at the Hubs, acting as 6BBRs. It can be observed that this latter design builds a form of Network Layer Infrastructure ESS.
+</t>
+
+
+
+   </section><!--Subnets and Global Addresses-->
+
+
+   <section > <name>Anycast and Multicast Addresses</name>
+   <t>
+   While IPv6 ND is defined for unicast addresses only, <xref target="I-D.ietf-6lo-multicast-registration"/>
+   extends <xref target="RFC8505"/> for anycast and multicast IPv6 addresses.
+   </t>
+   <t> <xref target="I-D.ietf-6lo-multicast-registration"/> can be used as a replacement for MLDv2 <xref target="RFC3810"/> for use cases where broadcast are not desirable, and when a device push model such as SFAAC is preferred over a network pull such as MDv2 and classical ND.
+   With <xref target="RFC8505"/>, the host does not need to define SNMAs for its unicast addresses and does not perform the associated MLDv2 operation. With <xref target="I-D.ietf-6lo-multicast-registration"/>, MLDv2 and its extensive use of broadcast can be totally eliminated.
+   </t>
+   <t>
+   In the case of anycast, the signal enables the 6BBRs to accept more than one registration for the same address, and collectively elect the registering host receives a packet for a given anycast address.
+   </t>
+   </section><!--Anycast and Multicast Addresses -->
+
+   </section><!--Wireless ND-->
+
+   <section > <name>WiND Applicability</name>
+
+
+<t>
+WiND applies equally to P2P links, P2MP Hub-and-Spoke, link-layer Broadcast Domain Emulation such as Mesh-Under and Wi-Fi BSS, and Route-Over meshes.
+</t>
+<t>
+There is an intersection where The IP link and the IP subnet are congruent and where both ND and WiND could apply. These includes P2P, the MAC emulation of a PHY broadcast domain, and the particular case of always on, fully overlapping physical radio broadcast domain. But even in those cases where both are possible,  WiND is preferable vs. ND because it reduces the need of broadcast.
+</t>
+<t>
+This is discussed in more details in the introduction of <xref target="RFC8929"/>.
+</t>
+<t>
+There are also a number of practical use cases in the wireless world where links and subnets are not congruent:
+</t>
+
+<ul>
+
+<li> The IEEE Std. 802.11 infrastructure BSS enables one subnet per AP, and emulates a broadcast domain at the link-layer. The Infrastructure ESS extends that model over a backbone and recommends the use of an ND proxy <xref target="IEEEstd80211"/> to interoperate with Ethernet-connected nodes. WiND incorporates an ND proxy to serve that need, which was missing so far.
+</li>
+
+<li> Bluetooth is Hub-and-Spoke at the link-layer. It would make little sense to configure a different subnet between the central and each individual peripheral node (e.g., sensor). Rather, <xref target="RFC7668"/> allocates a prefix to the central node acting as router, and each peripheral host (acting as a host) forms one or more address(es) from that same prefix and registers it.
+</li>
+
+<li>
+<t> A typical SmartGrid networks puts together Route-Over MLSNs that comprise thousands of IPv6 nodes. The 6TiSCH architecture <xref target="RFC9030"/> presents the Route-Over model over an IEEE Std. 802.15.4 Time-Slotted Channel-Hopping (TSCH) <xref target="IEEEstd802154"/> mesh, and generalizes it for multiple other applications.
+</t><t>
+Each node in a SmartGrid network may have tens to a hundred others nodes in range. A key problem for the routing protocol is which other node(s) should this node peer with, because most of the possible peers do not provide added routing value. When both energy and bandwidth are constrained, talking to them is a waste of resources and most of the possible P2P links are not even used. Peerings that are actually used come and go with the dynamics of radio signal propagation. It results that allocating prefixes to all the possible P2P links and maintain as many addresses in all nodes is not even considered.
+</t>
+</li>
+</ul>
+<!--
+
+
+About the size of the registrar, the backbone router enables a distribution of it. But really that is a discussion of the past. Routers can have gigs of memory. The registrar is usually push to a redundant server somewhere, e.g., on modern fabrics that often rely on overlays, mapping servers can scale, to the 10^12 I heard claim for the case of LISP MSMR. The real question is how to migrate from the ND reactive model to a version of ND that is more friendly to new usages such as rapid mobility and large overlays. draft-thubert-6lo-unicast-lookup is a beginning of an answer.
+
+
+
+-->
+
+
+
+<!--
+
+A radio mesh in our SmartGrid deployments has thousands of nodes, each with 10s to 100 others in range. A key problem for the routing protocol is who should this node peer with, because you see, most of the possible peers are no added value and both energy and bandwidth are limited so even talking to them is a bad idea.
+
+Even if we could e.g., by stretching homenet, nobody is willing to spend energy and bandwidth allocating prefixes to all the possible pairs or maintain as many addresses in all nodes.
+Renumbering a meter means talking to a central application to indicate a new address. No one wants that either.
+Most nodes are both routers and termination points. And we often use source routing.  ULA/GUA is needed on every node.
+
+For that use case:
+- ULA/GUA are needed on all nodes
+- one prefix per P2P is not feasible at scale
+- one prefix per node is feasible but may consume thousands of /64, hard to justify in large scale. For that model, use the WiND Hub-and-Spoke on every node, and routing between them
+- people usually go for a /64 per AP/root with nice side effects of compression and mobility so yes they route, but inside the subnet (MLSN). For that model, use the WiND Route-Over mode.
+
+
+
+-->
+
+   <section > <name>Case of LPWANs</name>
+<t>
+LPWANs are by nature so constrained that the addresses and subnets are fully pre-configured and operate as P2P or Hub-and-Spoke. This saves the steps of neighbor Discovery and enables a very efficient stateful compression of the IPv6 header.
+</t>
+   </section><!--Case of LPWANs-->
+   <section > <name>Case of Infrastructure BSS and ESS</name>
+<t>
+In contrast to IPv4, IPv6 enables a node to form multiple addresses, some of them temporary to elusive, and with a particular attention paid to privacy. Addresses may be formed and deprecated asynchronously to the association.
+</t>
+<t>
+Snooping protocols such as ND-Classic and DHCPv6 and observing data traffic sourced at the STA provides an imperfect knowledge of the state of the STA at the AP. Missing a state or a transition may result in the loss of connectivity for some of the addresses, in particular for an address that is rarely used, belongs to a sleeping node, or one in a situation of mobility. This may also result in undesirable remanent state in the AP when the STA ceases to use an IPv6 address while remaining associated. It results that snooping protocols is not a recommended technique and that it should only be used as last resort, when the WiND registration is not available to populate the state.
+</t>
+<t>
+The recommended alternative method is to use the WiND Registration for IPv6 Addresses. This way, the AP exposes its capability to proxy ND to the STA in Router Advertisement messages. In turn, the STA may request proxy ND services from the AP for all of its IPv6 addresses, using the Extended Address Registration Option, which provides the following elements:
+</t>
+<ul>
+<li>
+ The registration state has a lifetime that limits unwanted state remanence in the network.
+</li>
+<li>
+ The registration is optionally secured using <xref target="RFC8928"/> to prevent address theft and impersonation.
+</li>
+<li>
+The registration carries a sequence number, which enables to figure the order of events in a fast mobility scenario without loss of connectivity.
+</li>
+</ul>
+<t>
+The ESS mode requires a proxy ND operation at the AP. The proxy ND operation must cover Duplicate Address Detection, Neighbor Unreachability Detection, Address Resolution and Address Mobility to transfer a role of ND proxy to the AP where a STA is associated following the mobility of the STA.
+</t>
+<t>
+The WiND proxy ND specification that associated to the Address Registration is <xref target="RFC8929"/>. With that specification, the AP participates to the protocol as a Backbone Router, typically operating as a bridging proxy though the routing proxy operation is also possible.
+As a bridging proxy, the backbone router either replies to NS lookups with the MAC address of the STA, or preferably forwards the lookups to the STA as link-layer unicast frames to let the STA answer. For the data plane, the backbone router acts as a normal AP and bridges the packets to the STA as usual. As a routing proxy, the backbone router replies with its own MAC address and then routes to the STA at the IP layer. The routing proxy reduces the need to expose the MAC address of the STA on the wired side, for a better stability and scalability of the bridged fabric.
+</t>
+   </section><!--Case of Infrastructure BSS and ESS" -->
+   <section > <name>Case of Mesh Under Technologies</name>
+<t>
+The Mesh-Under provides a broadcast domain emulation with symmetric and Transitive properties and defines a transit link for IPv6 operations. It results that the model for IPv6 operation is similar to that of a BSS, with the root of the mesh operating as an Access Point does in a BSS/ESS.
+</t>
+<t>
+While it is still possible to operate ND-Classic, the inefficiencies of the flooding operation make the associated operations even less desirable than in a BSS, and the use of WiND is highly recommended.
+</t>
+
+   </section><!--Case of Mesh Under Technologies" -->
+
+   <section > <name>Case of DMB radios</name>
+<t>
+IPv6 over DMB radios uses P2P links that can be formed and maintained when a pair of DMB radios transmitters are in range from one another.
+</t>
+
+   <section > <name>Using ND-Classic only</name>
+<t>
+DMB radios do not provide MAC level broadcast emulation. An example of that is IEEE Std. 802.11 OCB which uses IEEE Std. 802.11 MAC/PHYs but does not provide the BSS functions.
+</t>
+<t>
+It is possible to form P2P IP links between each individual pairs of nodes and operate ND-Classic over those links with Link-Local addresses. DAD must be performed for all addresses on all P2P IP links.
+</t>
+<t>
+If special deployment care is taken so that the physical broadcast domains of a collection of the nodes fully overlap, then it is also possible to build an IP subnet within that collection of nodes and operate ND-Classic.
+</t>
+<t>
+If an external mechanism avoids duplicate addresses and if the deployment ensures the connectivity between peers, a non-transit Hub-and-Spoke deployment is also possible where the Hub is the only router in the subnet and the Prefix is advertised as not on-link.
+</t>
+   </section><!--Using ND-Classic only-->
+   <section > <name>Using Wireless ND</name>
+
+<t>
+Though this can be achieved with ND-Classic, WiND is the recommended approach since it uses unicast communications which are more reliable and less impacting for other users of the medium.
+</t>
+<t>
+The routers send RAs with a SLLAO at a regular period. The period can be indicated in the RA-Interval Option <xref target="RFC6275"/>. If available, the message can be transported in a compressed form in a beacon, e.g., in OCB Basic Safety Messages (BSM) that are nominally sent every 100ms.
+</t>
+<t>
+ An active beaconing mode is possible whereby the Host sends broadcast RS messages to which a router can answer with a unicast RA.
+</t>
+<t>
+A router that has Internet connectivity and is willing to serve as an Internet Access may advertise itself as a default router <xref target="RFC4191"/> in its RA messages. The RA is sent over an unspecified IP link where it does not conflict to anyone, so DAD is not necessary at that stage.
+</t>
+<t>
+The host instantiates an IP link where the router's address is not a duplicate. To achieve this, it forms a Link-Local Address that does not conflict with that of the router and registers to the router using <xref target="RFC8505"/>. If the router sent an RA(PIO), the host can also autoconfigure an address from the advertised prefix and register it.
+</t>
+
+<figure anchor='figReg'><name>RFC 8505 Registration Flow for a Link-Local Address</name>
+ <artwork><![CDATA[
+      (host)          (router)
+         |               |
+         |   DMB link    |
+         |               |
+         |  IPv6 ND RS   |
+         |-------------->|
+         |----------->   |
+         |------------------>
+         |  IPv6 ND RA   |
+         |<--------------|
+         |               |
+         |  NS(EARO)     |
+         |-------------->|
+         |               |
+         |  NA(EARO)     |
+         |<--------------|
+         |               |
+                        ...
+         |               |
+         |  NS(EARO)     |
+         |-------------->|
+         |               |
+         |  NA(EARO)     |
+         |<--------------|
+         |               |
+]]></artwork>
+</figure>
+<t>
+The lifetime in the registration should start with a small value (X=RMin, TBD), and exponentially grow with each re-registration to a larger value (X=Rmax, TBD). The IP link is considered down when (X=NbBeacons, TDB) expected messages are not received in a row. It must be noted that the physical link flapping does not affect the state of the registration and when a physical link comes back up, the active registrations (i.e., registrations for which lifetime is not elapsed) are still usable. Packets should be held or destroyed when the IP link is down.
+</t>
+<t>
+P2P links may be federated in Hub-and-Spoke by edge routers, and the Subnet may comprise multiple edge routers, in which case each advertises its registered addresses over the SGP as illustrated in <xref target="figReg2"/>. Note that the Extended DAR/DAC exchange can be omitted if it can be replaced with the information that is distributed in the SGP, see for instance <xref target="RFC9010"/> which applies to IoT environments, which needs only the first EDAR/EDAC exchange, and <xref target="I-D.thubert-bess-secure-evpn-mac-signaling"/>, for EVPN-based wireless deployments in enterprise and campus, which does not use EDAR/EDAC at all.
+</t>
+
+<figure anchor='figReg2'> <name>RFC 8505 Registration Flow for a Global Address</name>
+ <artwork><![CDATA[
+    6LoWPAN Node        6LR             6LBR
+      (host)          (router)       (registrar)
+         |               |               |
+         |               |               |
+         |  IPv6 ND RS   |               |
+         |-------------->|               |
+         |----------->   |               |
+         |------------------>            |
+         |  IPv6 ND RA   |               |
+         |<--------------|               |
+         |               |               |
+         |  NS(EARO)     |               |
+         |-------------->|               |
+         |               | Extended DAR  |
+         |               |-------------->|
+         |               |               |
+         |               | Extended DAC  |
+         |               |<--------------|
+         |  NA(EARO)     |
+         |<--------------|<inject in SGP> ->
+                        ...
+         |               |               |
+         |  NS(EARO)     |               |
+         |-------------->|               |
+         |               | Extended DAR  |
+         |               |-------------->|
+         |               |               |
+         |               | Extended DAC  |
+         |               |<--------------|
+         |  NA(EARO)     |               |
+         |<--------------|<maintain in SGP> ->
+         |               |               |
+                        ...
+]]></artwork>
+</figure>
+
+<t>
+An example Hub-and-Spoke is an OCB Road-Side Unit (RSU) that owns a prefix, provides Internet connectivity using that prefix to On-Board Units (OBUs) within its physical broadcast domain. An example of Route-Over MLSN is a collection of cars in a parking lot operating RPL to extend the connectivity provided by the RSU beyond its physical broadcast domain. Cars may then operate NEMO <xref target="RFC3963"/> for their own prefix using their address derived from the prefix of the RSU as CareOf Address.
+</t>
+   </section><!--Using Wireless ND-->
+   </section><!--Case of DMB radios-->
+   </section><!--IPv6 Over Wireless-->
+
+   <section > <name>IANA Considerations</name>
+      <t>
+         This specification does not require IANA action.
+      </t>
+   </section>
+
+   <section  anchor='coex' > <name>Coexistence with IPv6 ND</name>
+      <t>
+        The framework allows for a mixed environment with both models, classical ND and SFAAC, coexist. With <xref target="RFC8929"/>, an ethernet backbone link operating Classical ND federates a MultiLink Subnet (MLSN) of wireless links and/or meshes, and routers called Backbone Routers (6BBR) operate as ND proxies.
+</t>
+        <t>
+        In a wireless deployments, the Backbone Routers are placed along the wireless edge of a backbone (e.g., in Access Points) and federate multiple wireless links to form a single MLSN, echoing the Wi-Fi ESS structure but at Layer-3, as shown in <xref target="figReg3"/>. In that example, Optimistic Duplicate Address Detection (ODAD) <xref target="RFC4429"/> allows the IPv6 address to be used before completion of DAD, so the whole flow below can happen in the milliseconds that follow the Wi-Fi association.
+        </t>
+<figure anchor='figReg3'> <name>Initial Registration Flow to a 6BBR Acting as a ND Proxy</name>
+ <artwork><![CDATA[
+       6LN(STA)          6BBR(AP)          6LBR          default GW
+         |                  |                |                   |
+         | Wi-Fi Access BSS |   IPv6 Backbone (e.g., Ethernet)   |
+         |                  |                |                   |
+         |  RS(multicast)   |                |                   |
+         |----------------->|                |                   |
+         | RA(PIO, Unicast) |                |                   |
+         |<-----------------|                |                   |
+         |   NS(EARO)       |                |                   |
+         |----------------->|                |                   |
+         |                  |  Extended DAR  |                   |
+         |                  |--------------->|                   |
+         |                  |  Extended DAC  |                   |
+         |                  |<---------------|                   |
+         |                  |                                    |
+         |                  |     NS-DAD(EARO, multicast)        |
+         |                  |-------->                           |
+         |                  |------------------->                |
+         |                  |----------------------------------->|
+         |                  |                                    |
+         |                  |      RS(no SLLAO, for ODAD)        |
+         |                  |----------------------------------->|
+         |                  | if (no fresher Binding) NS(Lookup) |
+         |                  |                   <----------------|
+         |                  |          <-------------------------|
+         |                  |<-----------------------------------|
+         |                  |      NA(SLLAO, not(O), EARO)       |
+         |                  |----------------------------------->|
+         |                  |           RA(unicast)              |
+         |                  |<-----------------------------------|
+         |                  |                                    |
+         |           IPv6 Packets in Optimistic Mode             |
+         |<----------------------------------------------------->|
+         |                  |                                    |
+         |                  |
+         |  NA(EARO)        |  <DAD timeout>
+         |<--------- -------|
+         |                  |
+]]></artwork>
+</figure>
+<t>
+In use cases such as overlays, a Map Resolver acting as 6LBR may be deployed on the Backbone Link to serve the whole subnet, and EDAR/EDAC messages (or equivalent alternates, e.g., using LISP) can be used in combination with DAD to enable coexistence with IPv6 ND over the backbone. The 6LBR proactive operations will then coexist on the Backbone with the reactive classical IPv6 ND operation. Nodes that support <xref target="I-D.thubert-6lo-unicast-lookup"/> may query the mappings they look up with the 6LBR before attempting the reactive operation, which may be avoided if the 6LBR is conclusive, either detecting a duplication or returning a mapping. This model also enables a snooping switch acting as ND proxy to intercept Ar and DAD NS messages and perform unicast lookups to the resolver and only broadcast the original NS messgae when the unicast lookup fails.
+</t>
+<t>
+Note that the RS sent initially by the 6LN (e.g., a Wi-Fi STA) is transmitted as a multicast, but since it is intercepted by the 6BBR, it is never effectively broadcast at layer-2. The multiple arrows in <xref target="figReg3"/> associated to the ND messages on the backbone denote a real Layer-2 broadcast.
+</t>
+<t> It is not necessary to isolate the registering nodes in separate physical links, but it is preferred with wireless links as it enables to isolate the broadcast domain on the ethernet link from the wireless links at the Access Points.
+In other words, the 6BBRs collectively form a global registrar for the Subnet that aggregates the information in each local registrar in the 6LBR. The global registrar is distributed between the 6BBRs, which leverage classical IPv6 ND (AR and DAD) to lookup information that they do not have locally from the other 6BBRs and from nodes that are connected to the backbone.
+</t>
+        <t>
+
+       In the case of wireless meshes, RPL may be used as local SGP in each mesh as shown in <xref target="figReg4"/>. More details on the operation of WiND and RPL over the MLSN can be found in section 3.1, 3.2, 4.1 and 4.2.2 of <xref target="RFC9030"/>.
+</t>
+
+<figure anchor='figReg4'> <name>Initial Registration Flow with 6BBR ND-Proxy</name>
+ <artwork><![CDATA[
+    6LoWPAN Node        6LR             6LBR            6BBR
+     (RPL leaf)       (router)         (root)
+         |               |               |               |
+         |  6LoWPAN ND   |6LoWPAN ND+RPL | 6LoWPAN ND    | ND-Classic
+         |   LLN link    |Route-Over mesh|Ethernet/serial| Backbone
+         |               |               |               |
+         |  IPv6 ND RS   |               |               |
+         |-------------->|               |               |
+         |----------->   |               |               |
+         |------------------>            |               |
+         |  IPv6 ND RA   |               |               |
+         |<--------------|               |               |
+         |               |    <once>     |               |
+         |  NS(EARO)     |               |               |
+         |-------------->|               |               |
+         | 6LoWPAN ND    | Extended DAR  |               |
+         |               |-------------->|               |
+         |               |               |  NS(EARO)     |
+         |               |               |-------------->|
+         |               |               |  proxy registration
+         |               |               |               |
+         |               |               |         NS-DAD (EARO)
+         |               |               |               |------>
+         |               |               |               ND proxy
+         |               |               |               |
+         |               |               |  NA(EARO)     |<timeout>
+         |               |               |<--------------|
+         |               | Extended DAC  |               |
+         |               |<--------------|               |
+         |  NA(EARO)     |               |               |
+         |<--------------|               |               |
+         |               |               |               |
+]]></artwork>
+</figure>
+   </section>
+   <section  anchor='pri' > <name>Privacy Considerations</name>
+      <t>
+    Classical ND exposes all addresses to all nodes in the Subnet, which is a privacy issue and makes impersonation attacks easier. In contrast, in switched and wireless networks, a host is not on-path of the unicast packets for registration and for data for other hosts, so it cannot snoop the other addresses in the network.
+    A rogue host can only discover the existence of an addresses by trying and failing to register that address, but for that it would need to fathom which address to try and that can be very hard in a /64 address space taht is used wisely.
+    For that reason, this framework limits that knowledge to on-path snooping switches, to the routers and to the abstract registrar, which are typically more controlled / harder to hack than the common host.
+    When classical ND and SFAAC coexist within the same Subnet, all addresses in the Subnet, including registered addresses, can be snooped in the broadcast domain where classical IPv6 ND is operated. It makes sense to reduce that domain to the maximum and control which device connect to it.
+      </t>
+      <t>
+    The exposure of addresses can be further reduced if the exchanges with the registrar (e.g., EDAR and EDAC) are encrypted, e.g., using a public key associated with the registrar. The registration and routing exchanges could also be encrypted to avoid leaking the addresses to snopping switches, but this is typically not done inside a physical site where the networking gear is tightly controlled. In a DCI environment, the inter-side (SD-WAN) links are typically encrypted, to the exchanges are obfuscated from an on-path listener.
+      </t>
+
+   </section><!-- "Privacy Considerations" -->
+   <section  anchor='sec' > <name>Security Considerations</name>
+
+      <t>The registration model <xref target="RFC8505"/> implemented by this framework allows for a model where the ingress routers have a full knowledge of all the addresses in the Subnet. The ingress router can thus discard any packet which destination appears to be in the Subnet from its prefix, but is not known, meaning that it does not exist. This mostly defeats the traditional DoS scanning attacks against ND whereby the remote attacker sends volumes of packets to as many non-existent addresses to saturate the Neighbor Cache and clog the Subnet internal bandwidth in broadcasts.
+      </t>
+      <t>When the ownership verifier is cryptographic, this framework enables a zerotrust model whereby only the address owner can advertise an address in ND and as source of data packets, more in <xref target="RFC8928"/>.
+      This defeats the classical impersonation attacks against IPv6 ND and allows to disable the proprietary middlebox software aimed at protecting the address ownership against onlink rogues.
+      </t>
+   </section><!-- "Security Considerations" -->
+
+   <section > <name>Acknowledgments</name>
+   <t>Many thanks to the participants of the 6lo WG where a lot of the work discussed here happened, following work at ROLL, 6TiSCH, and mainly 6LoWPAN. Special thanks to Brian Carpenter and Eric Levy-Abegnoli who provided support and useful comments throughout the development of this architecture, and to Erik Nordmark and Zach Shelby with whom this work really started during IETF 72 in Dublin.
+   </t>
+   <t>
+   Also many thanks to Eduard Vasilenko, XiPeng Xiao, for their contributions and support to this work at 6MAN, v6Ops, and ETSI IPE.
+   </t>
+   </section><!-- ack -->
+</middle>
+
+<back>
+
+   <displayreference   target="I-D.thubert-bess-secure-evpn-mac-signaling" to="EVPN-SFAAC"/>
+   <displayreference   target="I-D.thubert-6lo-unicast-lookup"          to="UNICAST AR"/>
+   <displayreference   target="I-D.nordmark-6man-dad-approaches"        to="DAD APPROACHES"/>
+   <displayreference   target="I-D.yourtchenko-6man-dad-issues"         to="DAD ISSUES"/>
+   <displayreference   target="I-D.vyncke-6man-mcast-not-efficient"     to="MCAST EFFICIENCY"/>
+   <displayreference   target="I-D.ietf-mboned-ieee802-mcast-problems"  to="MCAST PROBLEMS"/>
+   <displayreference   target="I-D.bi-savi-wlan"                        to="SAVI"/>
+   <displayreference   target="IEEE802154"                              to="IEEE Std. 802.15.4"/>
+   <displayreference   target="IEEEstd8021"                             to="IEEE Std. 802.1"/>
+   <displayreference   target="IEEEstd80211"                            to="IEEE Std. 802.11"/>
+
+   <references > <name>Normative References</name>
+
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3963.xml'/> <!-- Network Mobility (NEMO) -->
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4191.xml'/> <!-- router preference option -->
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4861.xml'/> <!-- neighbor Discovery for IP version 6 (IPv6) -->
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4862.xml'/> <!-- IPv6 Stateless Address Autoconfiguration -->
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5942.xml'/> <!-- IPv6 Subnet Model: The Relationship between Links and Subnet Prefixes -->
+       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6275.xml'/> <!-- Mobility Support in IPv6 -->
+       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6830.xml'/> <!-- LISP -->
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8200.xml'/> <!-- Internet Protocol, Version 6 (IPv6) Specification -->
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8505.xml'/> <!-- RFC6775 update -->
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8928.xml'/> <!-- AP-ND  -->
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8929.xml'/> <!-- backbone router -->
+
+   </references>
+   <references > <name>Informative References</name>
+
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3810.xml'/> <!-- MLDv2 -->
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4291.xml'/> <!-- IP Version 6 Addressing Architecture -->
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4429.xml'/> <!-- ODAD -->
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4903.xml'/> <!-- IPv6  Multi-link subnet Issues   -->
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6550.xml'/> <!-- RPL: IPv6 Routing Protocol for Low-Power and Lossy Networks -->
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6775.xml'/> <!--  IPv6 6LoWPAN ND -->
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7668.xml'/> <!--  IPv6 over BTLE -->      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7217.xml'/> <!--  IPv6 over BTLE -->
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7834.xml'/>
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8273.xml'/>
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8365.xml'/>
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8415.xml'/><!--  DHCPv6 -->
+     <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8981.xml'/> <!-- Temporary Address Extensions for Stateless Address Autoconfiguration in IPv6 -->
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-rift-rift.xml'/>
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.9010.xml'/>
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.yourtchenko-6man-dad-issues.xml'/>
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.vyncke-6man-mcast-not-efficient.xml'/>
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.9030.xml'/>
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-mboned-ieee802-mcast-problems.xml'/>
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.bi-savi-wlan.xml'/>
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.thubert-6lo-unicast-lookup.xml'/>
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.nordmark-6man-dad-approaches.xml'/>
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.thubert-bess-secure-evpn-mac-signaling.xml'/>
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-6lo-multicast-registration.xml'/>
+
+      <reference anchor="IEEE802154">
+         <front>
+            <title>IEEE Std. 802.15.4, Part. 15.4: Wireless Medium Access
+            Control (MAC) and Physical Layer (PHY) Specifications for Low-Rate
+            Wireless Personal Area Networks
+            </title>
+            <author>
+               <organization>IEEE standard for Information Technology</organization>
+            </author>
+            <date/>
+         </front>
+      </reference>
+
+            <reference anchor="IEEEstd80211">
+         <front>
+            <title>IEEE Standard for Information technology --
+		Telecommunications and information exchange between systems
+		Local and metropolitan area networks-- Specific requirements
+		Part 11: Wireless LAN Medium Access Control (MAC) and Physical
+		Layer (PHY) Specifications
+            </title>
+            <author>
+               <organization>
+		IEEE standard for Information Technology</organization>
+            </author>
+            <date/>
+         </front>
+      </reference>
+
+
+      <reference anchor="IEEEstd802151">
+         <front>
+            <title> IEEE Standard for Information Technology -
+		Telecommunications and Information Exchange Between Systems -
+		Local and Metropolitan Area Networks - Specific Requirements. -
+		Part 15.1: Wireless Medium Access Control (MAC) and Physical
+		Layer (PHY) Specifications for Wireless Personal Area Networks
+		(WPANs)
+            </title>
+            <author>
+            	<organization> IEEE standard for Information Technology
+		</organization>
+            </author>
+            <date/>
+         </front>
+      </reference>
+
+      <reference anchor="IEEEstd802154">
+         <front>
+            <title> IEEE Standard for Local and metropolitan area networks --
+                Part 15.4: Low-Rate Wireless Personal Area Networks (LR-WPANs)
+            </title>
+            <author>
+		<organization> IEEE standard for Information Technology
+		</organization>
+            </author>
+            <date/>
+         </front>
+      </reference>
+
+      <reference anchor="IEEEstd8021">
+         <front>
+            <title>
+		IEEE Standard for Information technology -- Telecommunications
+		and information exchange between systems Local and metropolitan
+		area networks Part 1: Bridging and Architecture
+            </title>
+            <author>
+               <organization>
+			IEEE standard for Information Technology</organization>
+            </author>
+            <date/>
+         </front>
+      </reference>
+
+
+   </references>
+</back>
+
+</rfc>
