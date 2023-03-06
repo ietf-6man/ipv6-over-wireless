@@ -51,13 +51,12 @@ updates="RFC4291" consensus="true" submissionType="IETF" xml:lang="en" version="
    <keyword>Draft</keyword>
    <abstract>
       <t>
-    This document extends RFC 4291 for IPv6 over modern Non-Broadcast /
-    Non-Transitive networks that decouples the physical concepts of interface,
-    link and broadcast domain from the IP concepts of Interface, Link and
-    Subnet, with the primary goal to apply on networks where broadcast is
-    undesirable. A study of the issues with classical ND over wireless media is
-    presented, and a framework to solve those issues within the new architecture
-    is proposed.
+   This document extends RFC 4291 for IPv6 over modern Non-Broadcast /
+   Non-Transitive networks that decouples the IP concepts of Interface, Link and
+   Subnet from the physical concepts of interface, link and broadcast domain,
+   with the primary goal to apply on networks where broadcast is undesirable.
+   A study of the issues with classical ND over wireless media is presented,
+   and a framework to solve those issues within the new architecture is proposed.
       </t>
    </abstract>
 </front>
@@ -797,6 +796,28 @@ The registration in <xref target="RFC8505"/> is abstract to the routing protocol
    </t>
    </section><!--Anycast and Multicast Addresses -->
 
+
+   <section > <name>Advertising Prefixes in the SGP</name>
+   <t>
+   By definition, prefixes longer than 64 are inside a Subnet and do not leak outside the SGP.
+   Still, it is valid for a node to register a prefix of any size longer than 64,
+   and for the router to advertise the registered prefix in the IGP.
+   This can be useful for instance to expose a /96 Prefix that is used to
+   transport IPv4 mapped traffic <xref target="RFC6052"/>.
+   </t>
+   <t>
+   <xref target="I-D.thubert-6lo-prefix-registration"/> extends
+   <xref target="RFC8505"/> to enable a node that owns or is directly
+   connected to a prefix to register that prefix to neighbor routers.
+   The registration indicates that the registered prefix can be reached
+   via the advertising node without a loop.  The prefix registration
+   also provides a protocol-independent interface for the node to
+   request neighbor router(s) to redistribute the prefix to the larger
+   routing domain using their specific routing protocols.
+   </t>
+
+   </section><!--Anycast and Multicast Addresses -->
+
    </section><!--Wireless ND-->
 
    <section > <name>WiND Applicability</name>
@@ -1163,6 +1184,7 @@ In other words, the 6BBRs collectively form a global registrar for the Subnet th
 
    <displayreference   target="I-D.thubert-bess-secure-evpn-mac-signaling" to="EVPN-SFAAC"/>
    <displayreference   target="I-D.thubert-6lo-unicast-lookup"          to="UNICAST AR"/>
+   <displayreference   target="I-D.thubert-6lo-prefix-registration"          to="PREFIX REGISTRATION"/>
    <displayreference   target="I-D.nordmark-6man-dad-approaches"        to="DAD APPROACHES"/>
    <displayreference   target="I-D.yourtchenko-6man-dad-issues"         to="DAD ISSUES"/>
    <displayreference   target="I-D.vyncke-6man-mcast-not-efficient"     to="MCAST EFFICIENCY"/>
@@ -1179,6 +1201,7 @@ In other words, the 6BBRs collectively form a global registrar for the Subnet th
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4861.xml'/> <!-- neighbor Discovery for IP version 6 (IPv6) -->
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4862.xml'/> <!-- IPv6 Stateless Address Autoconfiguration -->
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5942.xml'/> <!-- IPv6 Subnet Model: The Relationship between Links and Subnet Prefixes -->
+       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6052.xml'/> <!-- IPv6 Addressing of IPv4/IPv6 Translators -->
        <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6275.xml'/> <!-- Mobility Support in IPv6 -->
        <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6830.xml'/> <!-- LISP -->
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8200.xml'/> <!-- Internet Protocol, Version 6 (IPv6) Specification -->
@@ -1209,6 +1232,7 @@ In other words, the 6BBRs collectively form a global registrar for the Subnet th
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-mboned-ieee802-mcast-problems.xml'/>
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.bi-savi-wlan.xml'/>
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.thubert-6lo-unicast-lookup.xml'/>
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.thubert-6lo-prefix-registration.xml'/>
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.nordmark-6man-dad-approaches.xml'/>
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.thubert-bess-secure-evpn-mac-signaling.xml'/>
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-6lo-multicast-registration.xml'/>

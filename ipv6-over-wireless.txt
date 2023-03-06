@@ -6,7 +6,7 @@
 Internet-Draft                                             Cisco Systems
 Updates: RFC4291 (if approved)                             M. Richardson
 Intended status: Informational                                 Sandelman
-Expires: 4 September 2023                                   3 March 2023
+Expires: 7 September 2023                                   6 March 2023
 
 
      Architecture and Framework for IPv6 over Non-Broadcast Access
@@ -15,12 +15,12 @@ Expires: 4 September 2023                                   3 March 2023
 Abstract
 
    This document extends RFC 4291 for IPv6 over modern Non-Broadcast /
-   Non-Transitive networks that decouples the physical concepts of
-   interface, link and broadcast domain from the IP concepts of
-   Interface, Link and Subnet, with the primary goal to apply on
-   networks where broadcast is undesirable.  A study of the issues with
-   classical ND over wireless media is presented, and a framework to
-   solve those issues within the new architecture is proposed.
+   Non-Transitive networks that decouples the IP concepts of Interface,
+   Link and Subnet from the physical concepts of interface, link and
+   broadcast domain, with the primary goal to apply on networks where
+   broadcast is undesirable.  A study of the issues with classical ND
+   over wireless media is presented, and a framework to solve those
+   issues within the new architecture is proposed.
 
 Status of This Memo
 
@@ -37,7 +37,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 4 September 2023.
+   This Internet-Draft will expire on 7 September 2023.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Thubert & Richardson    Expires 4 September 2023                [Page 1]
+Thubert & Richardson    Expires 7 September 2023                [Page 1]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -99,21 +99,22 @@ Table of Contents
      4.2.  links and Link-Local Addresses  . . . . . . . . . . . . .  27
      4.3.  Subnets and Global Addresses  . . . . . . . . . . . . . .  28
      4.4.  Anycast and Multicast Addresses . . . . . . . . . . . . .  29
+     4.5.  Advertising Prefixes in the SGP . . . . . . . . . . . . .  29
    5.  WiND Applicability  . . . . . . . . . . . . . . . . . . . . .  29
-     5.1.  Case of LPWANs  . . . . . . . . . . . . . . . . . . . . .  30
-     5.2.  Case of Infrastructure BSS and ESS  . . . . . . . . . . .  30
+     5.1.  Case of LPWANs  . . . . . . . . . . . . . . . . . . . . .  31
+     5.2.  Case of Infrastructure BSS and ESS  . . . . . . . . . . .  31
      5.3.  Case of Mesh Under Technologies . . . . . . . . . . . . .  32
      5.4.  Case of DMB radios  . . . . . . . . . . . . . . . . . . .  32
        5.4.1.  Using ND-Classic only . . . . . . . . . . . . . . . .  32
-       5.4.2.  Using Wireless ND . . . . . . . . . . . . . . . . . .  32
 
 
 
-Thubert & Richardson    Expires 4 September 2023                [Page 2]
+Thubert & Richardson    Expires 7 September 2023                [Page 2]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
 
+       5.4.2.  Using Wireless ND . . . . . . . . . . . . . . . . . .  33
    6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  36
    7.  Coexistence with IPv6 ND  . . . . . . . . . . . . . . . . . .  36
    8.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .  39
@@ -161,15 +162,15 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    operation may be inefficient (too many replications over constrained
    links), unreliable (broadcast may be lost in transmission),
    detrimental to network operations (broadcast storms), prone to
-   multiplication attacks (a unicast from the outside may cause a
 
 
 
-Thubert & Richardson    Expires 4 September 2023                [Page 3]
+Thubert & Richardson    Expires 7 September 2023                [Page 3]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
 
+   multiplication attacks (a unicast from the outside may cause a
    broadcast inside), and detrimental to privacy (an observer inside the
    network may listen to broadcasts and learn more than it needs for its
    own operation).
@@ -220,8 +221,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-
-Thubert & Richardson    Expires 4 September 2023                [Page 4]
+Thubert & Richardson    Expires 7 September 2023                [Page 4]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -277,7 +277,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023                [Page 5]
+Thubert & Richardson    Expires 7 September 2023                [Page 5]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -333,7 +333,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023                [Page 6]
+Thubert & Richardson    Expires 7 September 2023                [Page 6]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -389,7 +389,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023                [Page 7]
+Thubert & Richardson    Expires 7 September 2023                [Page 7]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -445,7 +445,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023                [Page 8]
+Thubert & Richardson    Expires 7 September 2023                [Page 8]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -501,7 +501,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023                [Page 9]
+Thubert & Richardson    Expires 7 September 2023                [Page 9]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -557,7 +557,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 10]
+Thubert & Richardson    Expires 7 September 2023               [Page 10]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -613,7 +613,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 11]
+Thubert & Richardson    Expires 7 September 2023               [Page 11]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -669,7 +669,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 12]
+Thubert & Richardson    Expires 7 September 2023               [Page 12]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -725,7 +725,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 13]
+Thubert & Richardson    Expires 7 September 2023               [Page 13]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -781,7 +781,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 14]
+Thubert & Richardson    Expires 7 September 2023               [Page 14]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -837,7 +837,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 15]
+Thubert & Richardson    Expires 7 September 2023               [Page 15]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -893,7 +893,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 16]
+Thubert & Richardson    Expires 7 September 2023               [Page 16]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -949,7 +949,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 17]
+Thubert & Richardson    Expires 7 September 2023               [Page 17]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1005,7 +1005,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 18]
+Thubert & Richardson    Expires 7 September 2023               [Page 18]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1043,7 +1043,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    The /64 boundary creates a wall between the traditional Interior
    Gateway Protocols (IGP) that operate between Subnets and manipulate
    shorter than 64 prefixes, and Subnet Gateway Protocols (SGP) that
-   operate inside a Subnet and manipulate shorter than 64 prefixes,
+   operate inside a Subnet and manipulate longer than 64 prefixes,
    typically /128 host routes, and possibly more specific data like
    Link-Layer Address mappings and Address Proof of Ownership.
 
@@ -1061,7 +1061,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 19]
+Thubert & Richardson    Expires 7 September 2023               [Page 19]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1117,7 +1117,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 20]
+Thubert & Richardson    Expires 7 September 2023               [Page 20]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1173,7 +1173,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 21]
+Thubert & Richardson    Expires 7 September 2023               [Page 21]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1229,7 +1229,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 22]
+Thubert & Richardson    Expires 7 September 2023               [Page 22]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1285,7 +1285,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 23]
+Thubert & Richardson    Expires 7 September 2023               [Page 23]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1341,7 +1341,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 24]
+Thubert & Richardson    Expires 7 September 2023               [Page 24]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1397,7 +1397,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 25]
+Thubert & Richardson    Expires 7 September 2023               [Page 25]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1453,7 +1453,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 26]
+Thubert & Richardson    Expires 7 September 2023               [Page 26]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1509,7 +1509,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 27]
+Thubert & Richardson    Expires 7 September 2023               [Page 27]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1565,7 +1565,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 28]
+Thubert & Richardson    Expires 7 September 2023               [Page 28]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1596,11 +1596,35 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    than one registration for the same address, and collectively elect
    the registering host receives a packet for a given anycast address.
 
+4.5.  Advertising Prefixes in the SGP
+
+   By definition, prefixes longer than 64 are inside a Subnet and do not
+   leak outside the SGP.  Still, it is valid for a node to register a
+   prefix of any size longer than 64, and for the router to advertise
+   the registered prefix in the IGP.  This can be useful for instance to
+   expose a /96 Prefix that is used to transport IPv4 mapped traffic
+   [RFC6052].
+
+   [PREFIX REGISTRATION] extends [RFC8505] to enable a node that owns or
+   is directly connected to a prefix to register that prefix to neighbor
+   routers.  The registration indicates that the registered prefix can
+   be reached via the advertising node without a loop.  The prefix
+   registration also provides a protocol-independent interface for the
+   node to request neighbor router(s) to redistribute the prefix to the
+   larger routing domain using their specific routing protocols.
+
 5.  WiND Applicability
 
    WiND applies equally to P2P links, P2MP Hub-and-Spoke, link-layer
    Broadcast Domain Emulation such as Mesh-Under and Wi-Fi BSS, and
    Route-Over meshes.
+
+
+
+Thubert & Richardson    Expires 7 September 2023               [Page 29]
+
+Internet-Draft               IPv6 over NBMA                   March 2023
+
 
    There is an intersection where The IP link and the IP subnet are
    congruent and where both ND and WiND could apply.  These includes
@@ -1613,18 +1637,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
    There are also a number of practical use cases in the wireless world
    where links and subnets are not congruent:
-
-
-
-
-
-
-
-
-Thubert & Richardson    Expires 4 September 2023               [Page 29]
-
-Internet-Draft               IPv6 over NBMA                   March 2023
-
 
    *  The IEEE Std. 802.11 infrastructure BSS enables one subnet per AP,
       and emulates a broadcast domain at the link-layer.  The
@@ -1657,6 +1669,19 @@ Internet-Draft               IPv6 over NBMA                   March 2023
       all the possible P2P links and maintain as many addresses in all
       nodes is not even considered.
 
+
+
+
+
+
+
+
+
+Thubert & Richardson    Expires 7 September 2023               [Page 30]
+
+Internet-Draft               IPv6 over NBMA                   March 2023
+
+
 5.1.  Case of LPWANs
 
    LPWANs are by nature so constrained that the addresses and subnets
@@ -1674,14 +1699,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    Snooping protocols such as ND-Classic and DHCPv6 and observing data
    traffic sourced at the STA provides an imperfect knowledge of the
    state of the STA at the AP.  Missing a state or a transition may
-
-
-
-Thubert & Richardson    Expires 4 September 2023               [Page 30]
-
-Internet-Draft               IPv6 over NBMA                   March 2023
-
-
    result in the loss of connectivity for some of the addresses, in
    particular for an address that is rarely used, belongs to a sleeping
    node, or one in a situation of mobility.  This may also result in
@@ -1714,6 +1731,13 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    transfer a role of ND proxy to the AP where a STA is associated
    following the mobility of the STA.
 
+
+
+Thubert & Richardson    Expires 7 September 2023               [Page 31]
+
+Internet-Draft               IPv6 over NBMA                   March 2023
+
+
    The WiND proxy ND specification that associated to the Address
    Registration is [RFC8929].  With that specification, the AP
    participates to the protocol as a Backbone Router, typically
@@ -1727,16 +1751,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    routes to the STA at the IP layer.  The routing proxy reduces the
    need to expose the MAC address of the STA on the wired side, for a
    better stability and scalability of the bridged fabric.
-
-
-
-
-
-
-Thubert & Richardson    Expires 4 September 2023               [Page 31]
-
-Internet-Draft               IPv6 over NBMA                   March 2023
-
 
 5.3.  Case of Mesh Under Technologies
 
@@ -1771,6 +1785,15 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    possible to build an IP subnet within that collection of nodes and
    operate ND-Classic.
 
+
+
+
+
+Thubert & Richardson    Expires 7 September 2023               [Page 32]
+
+Internet-Draft               IPv6 over NBMA                   March 2023
+
+
    If an external mechanism avoids duplicate addresses and if the
    deployment ensures the connectivity between peers, a non-transit Hub-
    and-Spoke deployment is also possible where the Hub is the only
@@ -1781,18 +1804,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    Though this can be achieved with ND-Classic, WiND is the recommended
    approach since it uses unicast communications which are more reliable
    and less impacting for other users of the medium.
-
-
-
-
-
-
-
-
-Thubert & Richardson    Expires 4 September 2023               [Page 32]
-
-Internet-Draft               IPv6 over NBMA                   March 2023
-
 
    The routers send RAs with a SLLAO at a regular period.  The period
    can be indicated in the RA-Interval Option [RFC6275].  If available,
@@ -1813,6 +1824,31 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    not conflict with that of the router and registers to the router
    using [RFC8505].  If the router sent an RA(PIO), the host can also
    autoconfigure an address from the advertised prefix and register it.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Thubert & Richardson    Expires 7 September 2023               [Page 33]
+
+Internet-Draft               IPv6 over NBMA                   March 2023
+
 
          (host)          (router)
             |               |
@@ -1842,14 +1878,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
        Figure 4: RFC 8505 Registration Flow for a Link-Local Address
 
-
-
-
-Thubert & Richardson    Expires 4 September 2023               [Page 33]
-
-Internet-Draft               IPv6 over NBMA                   March 2023
-
-
    The lifetime in the registration should start with a small value
    (X=RMin, TBD), and exponentially grow with each re-registration to a
    larger value (X=Rmax, TBD).  The IP link is considered down when
@@ -1873,35 +1901,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Thubert & Richardson    Expires 4 September 2023               [Page 34]
+Thubert & Richardson    Expires 7 September 2023               [Page 34]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1957,7 +1957,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 35]
+Thubert & Richardson    Expires 7 September 2023               [Page 35]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -2013,7 +2013,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 36]
+Thubert & Richardson    Expires 7 September 2023               [Page 36]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -2069,7 +2069,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 37]
+Thubert & Richardson    Expires 7 September 2023               [Page 37]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -2125,7 +2125,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 38]
+Thubert & Richardson    Expires 7 September 2023               [Page 38]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -2181,7 +2181,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 39]
+Thubert & Richardson    Expires 7 September 2023               [Page 39]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -2237,7 +2237,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 4 September 2023               [Page 40]
+Thubert & Richardson    Expires 7 September 2023               [Page 40]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -2268,6 +2268,11 @@ Internet-Draft               IPv6 over NBMA                   March 2023
               Prefixes", RFC 5942, DOI 10.17487/RFC5942, July 2010,
               <https://www.rfc-editor.org/info/rfc5942>.
 
+   [RFC6052]  Bao, C., Huitema, C., Bagnulo, M., Boucadair, M., and X.
+              Li, "IPv6 Addressing of IPv4/IPv6 Translators", RFC 6052,
+              DOI 10.17487/RFC6052, October 2010,
+              <https://www.rfc-editor.org/info/rfc6052>.
+
    [RFC6275]  Perkins, C., Ed., Johnson, D., and J. Arkko, "Mobility
               Support in IPv6", RFC 6275, DOI 10.17487/RFC6275, July
               2011, <https://www.rfc-editor.org/info/rfc6275>.
@@ -2282,21 +2287,22 @@ Internet-Draft               IPv6 over NBMA                   March 2023
               DOI 10.17487/RFC8200, July 2017,
               <https://www.rfc-editor.org/info/rfc8200>.
 
+
+
+
+
+
+
+Thubert & Richardson    Expires 7 September 2023               [Page 41]
+
+Internet-Draft               IPv6 over NBMA                   March 2023
+
+
    [RFC8505]  Thubert, P., Ed., Nordmark, E., Chakrabarti, S., and C.
               Perkins, "Registration Extensions for IPv6 over Low-Power
               Wireless Personal Area Network (6LoWPAN) Neighbor
               Discovery", RFC 8505, DOI 10.17487/RFC8505, November 2018,
               <https://www.rfc-editor.org/info/rfc8505>.
-
-
-
-
-
-
-Thubert & Richardson    Expires 4 September 2023               [Page 41]
-
-Internet-Draft               IPv6 over NBMA                   March 2023
-
 
    [RFC8928]  Thubert, P., Ed., Sarikaya, B., Sethi, M., and R. Struik,
               "Address-Protected Neighbor Discovery for Low-Power and
@@ -2339,20 +2345,19 @@ Internet-Draft               IPv6 over NBMA                   March 2023
               RFC 6775, DOI 10.17487/RFC6775, November 2012,
               <https://www.rfc-editor.org/info/rfc6775>.
 
+
+
+
+
+Thubert & Richardson    Expires 7 September 2023               [Page 42]
+
+Internet-Draft               IPv6 over NBMA                   March 2023
+
+
    [RFC7668]  Nieminen, J., Savolainen, T., Isomaki, M., Patil, B.,
               Shelby, Z., and C. Gomez, "IPv6 over BLUETOOTH(R) Low
               Energy", RFC 7668, DOI 10.17487/RFC7668, October 2015,
               <https://www.rfc-editor.org/info/rfc7668>.
-
-
-
-
-
-
-Thubert & Richardson    Expires 4 September 2023               [Page 42]
-
-Internet-Draft               IPv6 over NBMA                   March 2023
-
 
    [RFC7217]  Gont, F., "A Method for Generating Semantically Opaque
               Interface Identifiers with IPv6 Stateless Address
@@ -2394,6 +2399,17 @@ Internet-Draft               IPv6 over NBMA                   March 2023
               12 September 2022, <https://datatracker.ietf.org/doc/html/
               draft-ietf-rift-rift-16>.
 
+
+
+
+
+
+
+Thubert & Richardson    Expires 7 September 2023               [Page 43]
+
+Internet-Draft               IPv6 over NBMA                   March 2023
+
+
    [RFC9010]  Thubert, P., Ed. and M. Richardson, "Routing for RPL
               (Routing Protocol for Low-Power and Lossy Networks)
               Leaves", RFC 9010, DOI 10.17487/RFC9010, April 2021,
@@ -2402,14 +2418,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    [DAD ISSUES]
               Yourtchenko, A. and E. Nordmark, "A survey of issues
               related to IPv6 Duplicate Address Detection", Work in
-
-
-
-Thubert & Richardson    Expires 4 September 2023               [Page 43]
-
-Internet-Draft               IPv6 over NBMA                   March 2023
-
-
               Progress, Internet-Draft, draft-yourtchenko-6man-dad-
               issues-01, 3 March 2015,
               <https://datatracker.ietf.org/doc/html/draft-yourtchenko-
@@ -2449,22 +2457,28 @@ Internet-Draft               IPv6 over NBMA                   March 2023
               <https://datatracker.ietf.org/doc/html/draft-thubert-6lo-
               unicast-lookup-02>.
 
+
+
+
+
+Thubert & Richardson    Expires 7 September 2023               [Page 44]
+
+Internet-Draft               IPv6 over NBMA                   March 2023
+
+
+   [PREFIX REGISTRATION]
+              Thubert, P., "IPv6 Neighbor Discovery Prefix
+              Registration", Work in Progress, Internet-Draft, draft-
+              thubert-6lo-prefix-registration-02, 3 January 2023,
+              <https://datatracker.ietf.org/doc/html/draft-thubert-6lo-
+              prefix-registration-02>.
+
    [DAD APPROACHES]
               Nordmark, E., "Possible approaches to make DAD more robust
               and/or efficient", Work in Progress, Internet-Draft,
               draft-nordmark-6man-dad-approaches-02, 19 October 2015,
               <https://datatracker.ietf.org/doc/html/draft-nordmark-
               6man-dad-approaches-02>.
-
-
-
-
-
-
-Thubert & Richardson    Expires 4 September 2023               [Page 44]
-
-Internet-Draft               IPv6 over NBMA                   March 2023
-
 
    [EVPN-SFAAC]
               Thubert, P., Przygienda, T., and J. Tantsura, "Secure EVPN
@@ -2494,6 +2508,20 @@ Internet-Draft               IPv6 over NBMA                   March 2023
               11: Wireless LAN Medium Access Control (MAC) and Physical
               Layer (PHY) Specifications".
 
+
+
+
+
+
+
+
+
+
+Thubert & Richardson    Expires 7 September 2023               [Page 45]
+
+Internet-Draft               IPv6 over NBMA                   March 2023
+
+
    [IEEEstd802151]
               IEEE standard for Information Technology, "IEEE Standard
               for Information Technology - Telecommunications and
@@ -2514,13 +2542,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
               information exchange between systems Local and
               metropolitan area networks Part 1: Bridging and
               Architecture".
-
-
-
-Thubert & Richardson    Expires 4 September 2023               [Page 45]
-
-Internet-Draft               IPv6 over NBMA                   March 2023
-
 
 Authors' Addresses
 
@@ -2552,25 +2573,4 @@ Authors' Addresses
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Thubert & Richardson    Expires 4 September 2023               [Page 46]
+Thubert & Richardson    Expires 7 September 2023               [Page 46]
