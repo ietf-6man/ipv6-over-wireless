@@ -54,7 +54,7 @@ updates="RFC4291" consensus="true" submissionType="IETF" xml:lang="en" version="
    This document extends RFC 4291 for IPv6 over modern Non-Broadcast /
    Non-Transitive networks that decouples the IP concepts of Interface, Link and
    Subnet from the physical concepts of interface, link and broadcast domain,
-   with the primary goal to apply on networks where broadcast is undesirable.
+   to apply on networks where relying on broadcast is undesirable.
    A study of the issues with classical ND over wireless media is presented,
    and a framework to solve those issues within the new architecture is proposed.
       </t>
@@ -72,12 +72,15 @@ updates="RFC4291" consensus="true" submissionType="IETF" xml:lang="en" version="
     Unfortunately, Low-Power Lossy Networks (LLNs) and Wireless Local Area
     Networks (WLANs) generally do not benefit from the same reliable and cheap
     broadcast capabilities as Ethernet links.
+    .
     </t>
     <t>
-    Similarly, the use of broadcast is discouraged on large scale virtual
-    networks that are overlaid over distributed physical locations as meshes
-    of point-to-point (P2P) links, as it represents massive amounts of
-    replication.
+    Similarly, the use of broadcast is discouraged in large Data Center (DC)
+    fabrics and DC Interconnect (DCI) that extend the lower layer links in large
+    and physically distributed topologies as meshes of point-to-point (P2P)
+    links. In such case, an overlay broadcast service is typically emulated as
+    ingress (or reflector) replication and generates massive amounts of underlay
+    unicast messages, possibly over expensive Wide Area Network (WAN) links.
     All in all, as IPv6 Links migrate from a physical wire to virtual or
     intangible media, modern networks exhibit the common requirement to decouple
     physical properties such as broadcast capabilities and transitivity that are
@@ -85,11 +88,21 @@ updates="RFC4291" consensus="true" submissionType="IETF" xml:lang="en" version="
     manipulated at the IP layer.
     </t>
     <t>
-    This document presents an architecture for IPv6 over modern Non-Broadcast /
-    Non-Transitive networks that decouples the lower-layer concepts of links and
-    broadcast domains from the IP concepts of Links and Subnets. A study of the
-    issues with classical ND over wireless media is presented, and a framework
-    to solve those issues within the new architecture is proposed.
+    Classical IPv6 ND <xref target="RFC4861"/>,<xref target="RFC4862"/> relies
+    heavily on broadcast operation for Router Advertisement (RA), Address
+    Resolution (AR) and Duplicate Address Detection (DAD).
+    In modern networks, this may be inefficient (many
+    replications over constrained links), unreliable (broadcast may be lost in
+    transmission), detrimental to network operations (broadcast storms), prone
+    to multiplication attacks (a unicast from the outside may cause a broadcast
+    inside) and impersonation attacks, and detrimental to privacy (an observer
+    inside the network can discover other onlink addresses).
+    </t>
+
+    <t>
+    This document presents an architecture for IPv6 access networks that decouples the lower-layer concepts of links and  broadcast domains from the IP concepts of Links and Subnets, and limits the use and impact of broadcast.
+    This architecture is suitable for IPv6 over any network, including modern Non-Broadcast MultiAccess (NBMA) and  non-transitive Point-to-Multipoint (P2MP) networks.
+    A study of the issues with classical ND over wireless media is presented, and a framework to solve those issues within the new architecture is proposed.
     </t>
 
 
@@ -97,35 +110,51 @@ updates="RFC4291" consensus="true" submissionType="IETF" xml:lang="en" version="
 
    <section anchor="NDIssues"> <name>Issues with IPv6 ND-Based Access</name>
 
-
-
-     <section anchor='nd' > <name>ND-Classic and ND-Proxies</name>
-    <t>
-    Though ND-Classic was the state of the art when designed for an Ethernet wire
-    at the end of the twentieth century, it must be reevaluated for the new
-    technologies, such as wireless and overlays, that evolved since then.
-    In particular, relying on broadcast operation may be inefficient (too many
-    replications over constrained links), unreliable (broadcast may be lost in
-    transmission), detrimental to network operations (broadcast storms), prone
-    to multiplication attacks (a unicast from the outside may cause a broadcast
-    inside), and detrimental to privacy (an observer inside the network may
-    listen to broadcasts and learn more than it needs for its own operation).
-
-    </t>
-
+     <section anchor='nd' > <name>Classical IPv6 ND and ND-Proxies</name>
+     <t>
+    Though classical IPv6 ND was the state of the art when designed for early
+    Ethernet links at the end of the twentieth century, it is less appropriate
+    for modern networks such as wireless and overlays that cannot provide the
+    same cheap and reliable broadcast as a shared yellow wire.
+    The reactive AR operation was designed to limit the amount of memory that is
+    needed for the ND cache, at times where memory was scarce in the adapters.
+    This trade-off, broadcast bandwidth vs. memory in the adapters, should be
+    reevaluated for networks where router memory is aplenty but broadcast has
+    become expensive.
+     </t>
     <t>
 	The IPv6 ND Neighbor Solicitation (NS) <xref target="RFC4861"/> message
-	is used as a multicast IP packet for Address Resolution (AR) and Duplicate
-    Address Detection (DAD) <xref target="RFC4862"/>.
-    In those cases, the NS message is sent at the Network Layer to a
-	Solicited-Node Multicast Address (SNMA) <xref target="RFC4291"/> and should
-    in theory only reach a very small group of nodes.
-    It is intended for one Target, that may or may not be present in the network,
-    but it is often turned into a MAC-Layer broadcast and effectively reaches most
-    of the nodes that are attached to the layer 2 link.
+	is used as a multicast IP packet for AR and DAD <xref target="RFC4862"/>.
+    While the AR message is intended for one node that owns the Target address,
+    the expectation for DAD is that there's no node at all with that address.
+    A message that is intended for at most one node is certainly a poor
+    match for a broadcast operation.
+
     </t>
     <t>
-    DAD was designed for the efficient broadcast operation of Ethernet.
+    The NS message for AR and DAD are sent at the Network Layer to a
+    Solicited-Node Multicast Address (SNMA) <xref target="RFC4291"/> and should
+    in theory only reach a very small group of nodes. Note that to support SNMA,
+    the host must also support Multicast Listener Discovery (MLD)
+    <xref target="RFC3810"/>, which may be an additional burden to a constrained
+    stack, and the switches should support their own multicast routing and state,
+    which is pushing the real problems to the lower layers.
+    </t>
+    <t>
+
+    Note that if implemented, the SNMA model would mean close to one state per
+    address is every switch since there is often only one address with the same
+    SNMA in the network - though the birthday paradox applies. This amount of
+    memory may not have been available in early switches, and still does not
+    make much economical sense today when a complete ND cache in the
+    not-onlink mode of ND requires one state per addreses in every router vs.
+    every switch.
+   </t>
+    <t>
+       This is why in practice, these messages are mapped to link-layer broadcast
+    on Ethernet and Wireless networks, and to ingress replication in overlays.
+    </t>
+    <t>
     Experiments show that DAD often fails to discover the duplication of IPv6
     addresses in large wireless access networks
     <xref target="I-D.yourtchenko-6man-dad-issues"/>. In practice, IPv6
@@ -134,8 +163,6 @@ updates="RFC4291" consensus="true" submissionType="IETF" xml:lang="en" version="
     the 64-bit Interface IDs (IIDs) that makes a collision quasi-impossible for
     randomized IIDs.
     </t>
-    <t>Arguably, IPv6 ND brought the support if multicast that should have reduced the broadcast traffic for DAD and AR, but in practice IPv6 ND multicast messages are mapped to link-layer broadcast on Ethernet and Wireless networks, and replication on overlays. The multicast model to Solicited Node Multicast Addresses (SNMA) probably does not make much economical sense either, since it would mean close to one state per address is every switch (there's usually only one address with the same SNMA, though the birthday paradox applies) when a complete ND cache would require only one state in every router, and there are typically far less routers than switches in the subnet.
-   </t>
     <t>
     Multicast NS transmissions may occur when a node joins the
     network, moves, or wakes up and reconnects to the network.
@@ -172,7 +199,7 @@ updates="RFC4291" consensus="true" submissionType="IETF" xml:lang="en" version="
     <xref target="I-D.bi-savi-wlan"/> suggests discovering the addresses by snooping the ND-Classic protocol, but that can also be unreliable. An IPv6 address may not be discovered immediately due to a packet loss. It may never be discovered in the case of a "silent" node that is not currently using one of its addresses, e.g., a printer that waits in wake-on-lan state.  A change of anchor, e.g. due to a movement, may be missed or misordered, leading to unreliable connectivity and an incomplete list of addresses.
     </t>
 
-     </section > <!--ND-Classic, Wireless ND and ND-Proxies-->
+     </section > <!--Classical IPv6 ND and ND-Proxies-->
 
    <section anchor="wirelessIssues"> <name>The case of Wireless</name>
     <t>
@@ -234,7 +261,7 @@ updates="RFC4291" consensus="true" submissionType="IETF" xml:lang="en" version="
     Layer-2 Overlays (VLANs) reduce the broadcast domain from the physical one, whereas Layer-3 overlays (e.g., VxLAN) can extend the Subnet beyond the limits of the physical network, enabling to deploy a Subnet over large physical domains. Layer-3 overlays are a clear indication of the need to decouple the Subnet from the limits of physical network.
    </t>
    <t>
-    A Layer-3 overlay is typically a partial or full mesh of point to point tunnel connections between routers. In case of a full mesh, a BUM (Broadcast, Unknown, and Multicast) forwarding over the overly can be implemented as ingress replication, which becomes detrimental to the operation of the ingress router as the overlay grows in number. This can be optimized in multisite operations so only one copy flies across sites in Data Center Interconnect (DCI) environments. Still, BUM processing is costly as it spreads across all sites that the overlay spans, and its use should be limited to operations where a real broadcast operation is desired, e.g., every node is interested in receiving the packet.
+    A Layer-3 overlay is typically a partial or full mesh of point to point tunnel connections between routers. In case of a full mesh, a BUM (Broadcast, Unknown, and Multicast) forwarding over the overly can be implemented as ingress replication, which becomes detrimental to the operation of the ingress router as the overlay grows in number. This can be optimized in multisite operations so only one copy ships across sites in DCI environments. Still, BUM processing is costly as it spreads across all sites that the overlay spans, and its use should be limited to operations where a real broadcast operation is desired, e.g., every node is interested in receiving the packet.
    </t>
    <t>
    As discussed in <xref target="wirelessIssues"/>, multicast IPv6 ND messages are in fact broadcasted over the network, meaning that in the case of an overlay, they contribute to the BUM traffic as full broadcast. While a broadcast IPv6 ND RA message may be of interest within a site or a subsite to all local nodes, it is probably of little interest to other sites that are served by other routers, even when the overlay spans across both sites. The same goes for a local printer, the broadcast mDNS lookup should reach local printers but not faraway ones. This is another indication of the need to decouple the span of the Subnet from the lower layer broadcast domain.
@@ -382,7 +409,7 @@ layer 3 filters must restrict the link-scoped communication to remain between
 peers on a same IP link. More than one IP link may be installed on the same
 physical interface to connect to different peers.
 </li>
-<li>an IP link can be Point to Point (P2P), Point to Point (P2MP, forming a partial mesh), NBMA (non-broadcast multi-access, fully meshed), or transit (broadcast-capable and any-to-any).
+<li>an IP link can be Point to Point (P2P), Point to Point (P2MP, forming a partial mesh and non-transitive), NBMA (non-broadcast multi-access, fully meshed), or transit (broadcast-capable and any-to-any).
 </li>
 
 </ul>
@@ -622,7 +649,7 @@ In an <xref target="IEEEstd80211">IEEE Std. 802.11</xref> Infrastructure Extende
 It is also possible in the original model to broadcast a gratuitous frame to advertise self throughout the bridged network, and that is also a broadcast.
 </t>
 <t>
-The process of the Wi-Fi association prepares a bridging state proactively at the AP, which avoids the need for a reactive broadcast lookup over the wireless access. In an ESS, the AP may also generate a gratuitous broadcast sourced at the MAC address of the STA to prepare or update the state in the learning bridges so they point towards the AP for the MAC address of the STA. WiND emulates that proactive method at the Network Layer for the operations of AR, DAD and ND proxy.
+The process of the Wi-Fi association prepares a bridging state proactively at the AP, which avoids the need for a reactive broadcast lookup over the wireless access. In an ESS, the AP may also generate a gratuitous broadcast sourced at the MAC address of the STA to prepare or update the state in the learning bridges so they point towards the AP for the MAC address of the STA. This framework emulates that proactive method at the Network Layer for the operations of AR, DAD and ND proxy.
 </t>
 <t>
 In some instances of WLANs and LoWPANs, a Mesh-Under technology (e.g., a IEEE Std. 802.11s or IEEE Std. 802.15.10) provides meshing services that are similar to bridging, and the broadcast domain is well-defined by the membership of the mesh. Mesh-Under emulates a broadcast domain by flooding the broadcast packets at the link-layer. When operating on a single frequency, this operation is known to interfere with itself, and requires inter-frame gaps to dampen the collisions, which reduces further the amount of available bandwidth.
@@ -808,12 +835,11 @@ The registration in <xref target="RFC8505"/> is abstract to the routing protocol
    <t>
    <xref target="I-D.thubert-6lo-prefix-registration"/> extends
    <xref target="RFC8505"/> to enable a node that owns or is directly
-   connected to a prefix to register that prefix to neighbor routers.
-   The registration indicates that the registered prefix can be reached
+   connected to a Prefix to register that Prefix to neighbor routers.
+   The registration indicates that the registered Prefix can be reached
    via the advertising node without a loop.  The prefix registration
    also provides a protocol-independent interface for the node to
-   request neighbor router(s) to redistribute the prefix to the larger
-   routing domain using their specific routing protocols.
+   request the router to redistribute the prefix in the SGP.
    </t>
 
    </section><!--Anycast and Multicast Addresses -->
@@ -824,7 +850,9 @@ The registration in <xref target="RFC8505"/> is abstract to the routing protocol
 
 
 <t>
-WiND applies equally to P2P links, P2MP Hub-and-Spoke, link-layer Broadcast Domain Emulation such as Mesh-Under and Wi-Fi BSS, and Route-Over meshes.
+WiND applies equally to physical links that are P2P, transit, P2MP Hub-and-Spoke,
+to links that provide link-layer Broadcast Domain Emulation such as Mesh-Under
+and Wi-Fi BSS, and to Route-Over meshes.
 </t>
 <t>
 There is an intersection where The IP link and the IP subnet are congruent and where both ND and WiND could apply. These includes P2P, the MAC emulation of a PHY broadcast domain, and the particular case of always on, fully overlapping physical radio broadcast domain. But even in those cases where both are possible,  WiND is preferable vs. ND because it reduces the need of broadcast.
