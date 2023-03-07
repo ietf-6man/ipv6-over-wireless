@@ -74,7 +74,7 @@ Table of Contents
      2.1.  ND-Classic and ND-Proxies . . . . . . . . . . . . . . . .   4
      2.2.  The case of Wireless  . . . . . . . . . . . . . . . . . .   6
      2.3.  The case of Overlays  . . . . . . . . . . . . . . . . . .   7
-     2.4.  Power and Sustainability  . . . . . . . . . . . . . . . .   9
+     2.4.  Power and Sustainability  . . . . . . . . . . . . . . . .   8
      2.5.  Security and Privacy  . . . . . . . . . . . . . . . . . .   9
      2.6.  More Middleboxes  . . . . . . . . . . . . . . . . . . . .  10
      2.7.  Summary of Issues . . . . . . . . . . . . . . . . . . . .  12
@@ -309,7 +309,9 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    up to 90% of IPv6 link-local multicasts were dropped.  The impact on
    user experience is usually limited since for the most part, the users
    will connect to addresses outside the subnet and will not attempt to
-   locate one another.
+   locate one another.  The impact on the NOC might still be
+   significant, since a failure related to ND operations might be
+   transient and difficult to debunk after the fact.
 
    Another experiment conducted during an IETF meeting consisted in
    manually forcing address duplicates to observe the DAD behavior.
@@ -328,8 +330,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    Wi-Fi station must keep its radio turned on to listen to the periodic
    series of broadcast frames.  Most of those broadcasts are dropped at
    the Network Layer when the receiving node finds it is not interested,
-   as is the case of NS messages when the node is not the Target.  In
-   order to protect the battery lifetime, a typical smartphone will
 
 
 
@@ -338,6 +338,8 @@ Thubert & Richardson    Expires 8 September 2023                [Page 6]
 Internet-Draft               IPv6 over NBMA                   March 2023
 
 
+   as is the case of NS messages when the node is not the Target.  In
+   order to protect the battery lifetime, a typical smartphone will
    listen at a multiple of the broadcast period, blindly ignoring a
    large ratio of the broadcasts, and making ND-Classic operations even
    less reliable.
@@ -347,11 +349,12 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    transmissions often exhibit disappointing behaviors when employed
    unmodified on a local wireless medium (more in [MCAST PROBLEMS]).
    Even though there is at most one intended Target for a broadcast AR
-   or DAD message, and the broadcast impacts many wireless nodes over
-   the whole subnet (e.g., the ESS fabric), and yet the chances that
+   or DAD message, the broadcast impacts many wireless nodes over the
+   whole subnet (e.g., the ESS fabric), and yet the chances that
    intended Target receives the packet are limited.  The fact that the
    user experience for classic-ND is not so dramatically affected only
-   shows that those broadcasts are, for the most part, useless.
+   shows that those broadcasts are, for a large part, a useless waste of
+   expensive resources.
 
    Wi-Fi [IEEE Std. 802.11] Access Points (APs) deployed in an Extended
    Service Set (ESS) act as [IEEE Std. 802.1] bridges between the
@@ -376,16 +379,13 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    indication of the need to decouple the Subnet from the limits of
    physical network.
 
-
-
-
-
-
-
-
-
-
-
+   A Layer-3 overlay is typically a partial or full mesh of point to
+   point tunnel connections between routers.  In case of a full mesh, a
+   BUM (Broadcast, Unknown, and Multicast) forwarding over the overly
+   can be implemented as ingress replication, which becomes detrimental
+   to the operation of the ingress router as the overlay grows in
+   number.  This can be optimized in multisite operations so only one
+   copy ships across sites in DCI environments.  Still, BUM processing
 
 
 
@@ -394,13 +394,6 @@ Thubert & Richardson    Expires 8 September 2023                [Page 7]
 Internet-Draft               IPv6 over NBMA                   March 2023
 
 
-   A Layer-3 overlay is typically a partial or full mesh of point to
-   point tunnel connections between routers.  In case of a full mesh, a
-   BUM (Broadcast, Unknown, and Multicast) forwarding over the overly
-   can be implemented as ingress replication, which becomes detrimental
-   to the operation of the ingress router as the overlay grows in
-   number.  This can be optimized in multisite operations so only one
-   copy ships across sites in DCI environments.  Still, BUM processing
    is costly as it spreads across all sites that the overlay spans, and
    its use should be limited to operations where a real broadcast
    operation is desired, e.g., every node is interested in receiving the
@@ -438,18 +431,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    logical construct, decoupled from the physical adapters, and capable
    to encompass more than one.
 
-
-
-
-
-
-
-
-Thubert & Richardson    Expires 8 September 2023                [Page 8]
-
-Internet-Draft               IPv6 over NBMA                   March 2023
-
-
 2.4.  Power and Sustainability
 
    Misusing broadcast entails extraneous power consumption in any
@@ -461,6 +442,14 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    adjacent networks, this also means that power is consumed for a
    longer time (can be hundred time more) than for unicast.  Power is
    also wasted when replicating a packet to span an overlay.  In all
+
+
+
+Thubert & Richardson    Expires 8 September 2023                [Page 8]
+
+Internet-Draft               IPv6 over NBMA                   March 2023
+
+
    cases, to make the internet greener, we must reconsider the use of
    broadcast over large access networks.  To maintain the capability to
    build the Subnets we want, this means that we must decouple the
@@ -498,14 +487,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    Once it has discovered the presence of neighbor addresses, it becomes
    easy for the onlink attacker to impersonate any host in the network,
    either by sourcing packets with a stolen address, or by overriding
-
-
-
-Thubert & Richardson    Expires 8 September 2023                [Page 9]
-
-Internet-Draft               IPv6 over NBMA                   March 2023
-
-
    the neighbor caches with a NA that indicates the attacker's LLA.  It
    is thus desirable to avoid exposing the host IPv6 address in
    broadcast ND messages.  Additionally, it is desirable that only the
@@ -517,6 +498,14 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    network.  The attacker just needs to forge any random address from
    the subnet prefix and send the packet.  The Subnet ingress router
    will have to store that packet for the duration of the lookup time,
+
+
+
+Thubert & Richardson    Expires 8 September 2023                [Page 9]
+
+Internet-Draft               IPv6 over NBMA                   March 2023
+
+
    and broadcast an NS to lookup the forged address.  This both locks
    memory in the router and consumes bandwidth and energy, impacting all
    nodes in the Subnet.
@@ -542,8 +531,19 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    in the DHCP exchange (as long as it remains in the clear) and cancel
    undesirable ARP lookups.
 
-
-
+   In contrast to IPv4, IPv6 enables a node to form multiple addresses,
+   some of them temporary and with a particular attention paid to
+   privacy.  Addresses may be formed and deprecated asynchronously to
+   the association.  Even if the knowledge of IPv6 addresses used by a
+   STA can be obtained by snooping protocols such as ND-Classic and
+   DHCPv6, or by observing data traffic sourced at the STA, such methods
+   provide only an imperfect knowledge of the state of the STA at the
+   AP.  This may result in a loss of connectivity for some IPv6
+   addresses, in particular for addresses rarely used and in a situation
+   of mobility.  This may also result in undesirable state persistence
+   in the AP when a STA ceases to use an IPv6 address.  It follows that
+   snooping protocols is not a recommended technique and that it should
+   only be used as last resort.
 
 
 
@@ -561,20 +561,6 @@ Thubert & Richardson    Expires 8 September 2023               [Page 10]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
-
-   In contrast to IPv4, IPv6 enables a node to form multiple addresses,
-   some of them temporary and with a particular attention paid to
-   privacy.  Addresses may be formed and deprecated asynchronously to
-   the association.  Even if the knowledge of IPv6 addresses used by a
-   STA can be obtained by snooping protocols such as ND-Classic and
-   DHCPv6, or by observing data traffic sourced at the STA, such methods
-   provide only an imperfect knowledge of the state of the STA at the
-   AP.  This may result in a loss of connectivity for some IPv6
-   addresses, in particular for addresses rarely used and in a situation
-   of mobility.  This may also result in undesirable state persistence
-   in the AP when a STA ceases to use an IPv6 address.  It follows that
-   snooping protocols is not a recommended technique and that it should
-   only be used as last resort.
 
    Because ND-Classic is so easy to attack, some vendors have deployed
    undocumented proprietary counter measures as middlebox operation in
@@ -610,6 +596,20 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    term, this may affect the capability we have to evolve the protocol,
    like firewalls impact our capability to develop new transports in
    parallel to TCP and UDP.  We must either standardize (e.g., for ND
+   proxy) or eliminate those middlebox activities, and for that, the
+   IPv6 ND protocol must evolve to a model where proprietary middleboxes
+   are not needed anymore.  This demands a model that minimizes the use
+   of broadcasts, and where a contract provides mutual guarantees for
+   the host that need IPv6 addresses and the routers that provide
+   reachability and protection for these addresses.
+
+
+
+
+
+
+
+
 
 
 
@@ -617,13 +617,6 @@ Thubert & Richardson    Expires 8 September 2023               [Page 11]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
-
-   proxy) or eliminate those middlebox activities, and for that, the
-   IPv6 ND protocol must evolve to a model where proprietary middleboxes
-   are not needed anymore.  This demands a model that minimizes the use
-   of broadcasts, and where a contract provides mutual guarantees for
-   the host that need IPv6 addresses and the routers that provide
-   reachability and protection for these addresses.
 
 2.7.  Summary of Issues
 
@@ -666,14 +659,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    and sustainability.  Devices must be always attached and always
    powered on to answer AR and DAD messages, which makes ND-Classic
    inapplicable to constrained IoT devices that sleep for the vast
-
-
-
-Thubert & Richardson    Expires 8 September 2023               [Page 12]
-
-Internet-Draft               IPv6 over NBMA                   March 2023
-
-
    majority of their time.  The key design points in this architecture
    derive from the original observations made at the 6LoWPAN WG for
    constrained devices and networks, and focus on avoiding waste of
@@ -681,6 +666,13 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    only when broadcast is really needed, and decoupling the IP
    abstraction of a Subnet from the broadcast domains to avoid Subnet-
    wide broadcast storms.
+
+
+
+Thubert & Richardson    Expires 8 September 2023               [Page 12]
+
+Internet-Draft               IPv6 over NBMA                   March 2023
+
 
 3.  An Architecture for IPv6 over Non-Broadcast Networks
 
@@ -721,15 +713,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    in the Internet provided they can lay a mobility tunnel to one of the
    routers for use as IP Link to the Subnet.
 
-
-
-
-
-Thubert & Richardson    Expires 8 September 2023               [Page 13]
-
-Internet-Draft               IPv6 over NBMA                   March 2023
-
-
    All IP links are abstracted as Point-to-Point, though a lower-layer
    broadcast service may be used by the router to send RAs to a subset
    of local hosts in the subnet, or by the host to send an RS message to
@@ -739,6 +722,14 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    that connects to the Subnet from which the address derives.  The IP
    Interface connects to one or more IP Links (to different neighbors)
    over the same or over different physical interfaces (they are
+
+
+
+Thubert & Richardson    Expires 8 September 2023               [Page 13]
+
+Internet-Draft               IPv6 over NBMA                   March 2023
+
+
    decoupled).  A Link-Local Address is associated to the IP Link
    directly.  Each SubInterface connects to the subset of those IP Links
    that reach other nodes in the Subnet.
@@ -778,14 +769,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    registration for the same address is performed for the same
    registered node, so it also binds the registered node with the
    registered IPv6 address.  The registrar service provides APIs to look
-
-
-
-Thubert & Richardson    Expires 8 September 2023               [Page 14]
-
-Internet-Draft               IPv6 over NBMA                   March 2023
-
-
    up a link-layer address for an IPv6 address as well as validate IPv6
    address ownership.  The registrar can be implemented as a mapping
    server ala LISP, a distributed state ala ND proxy, or a synchronized
@@ -794,6 +777,14 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    the latter, the address mapping is synchronized by the routing
    protocol and known to all the routers for all nodes in the IP Subnet,
    so there is never a need for a reactive lookup.
+
+
+
+
+Thubert & Richardson    Expires 8 September 2023               [Page 14]
+
+Internet-Draft               IPv6 over NBMA                   March 2023
+
 
    On the one hand, the Architecture proposed in this document avoids
    the use of broadcast operation for DAD and AR, and on the other hand,
@@ -835,18 +826,21 @@ Internet-Draft               IPv6 over NBMA                   March 2023
       multiple lower layer links, e.g., in the case of a switched fabric
       or a mesh-under LLN.
 
+   *  an IP link defines the scope of an LLA, and defines the domain in
+      which the LLA must be unique
+
+   *  An IP Link is attached to a physical interface, and one Link Local
+      Address is associated to the IP Link.
+
+
+
+
 
 
 Thubert & Richardson    Expires 8 September 2023               [Page 15]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
-
-   *  an IP link defines the scope of an LLA, and defines the domain in
-      which the LLA must be unique
-
-   *  An IP Link is attached to a physical interface, and one Link Local
-      Address is associated to the IP Link.
 
    *  an IP link provides a subset of the connectivity that is offered
       by the physical link at the lower layer; if the IP link is
@@ -877,27 +871,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    Address only needs to be unique within that peer to peer
    relationship.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Thubert & Richardson    Expires 8 September 2023               [Page 16]
-
-Internet-Draft               IPv6 over NBMA                   March 2023
-
-
    +--------------------
    |
    |   IP Link 1 ---------------------------> Node 1
@@ -914,6 +887,16 @@ Internet-Draft               IPv6 over NBMA                   March 2023
          Physical interface
 
                        Figure 1: P2P Link Abstraction
+
+
+
+
+
+
+Thubert & Richardson    Expires 8 September 2023               [Page 16]
+
+Internet-Draft               IPv6 over NBMA                   March 2023
+
 
    If only the physical interface but not the Link-Layer address of the
    peer is visible from the IP layer when processing a message, then the
@@ -946,14 +929,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
       subInterface for the associated Subnet, and the address is
       advertised over each IP Link in the Subnet.
 
-
-
-
-Thubert & Richardson    Expires 8 September 2023               [Page 17]
-
-Internet-Draft               IPv6 over NBMA                   March 2023
-
-
    *  an IP Interface can be P2P, in which case it connects to a single
       IP Link, or P2MP, in which case it aggregates multiple IP Links.
       In a multihomed host, a single IP Interface can be installed to
@@ -963,6 +938,21 @@ Internet-Draft               IPv6 over NBMA                   March 2023
       one Subnet is reachable over a physical interface, more than one
       IP Interface may leverage that physical interface for
       transmission.
+
+
+
+
+
+
+
+
+
+
+
+Thubert & Richardson    Expires 8 September 2023               [Page 17]
+
+Internet-Draft               IPv6 over NBMA                   March 2023
+
 
    +--------------------
    |
@@ -994,6 +984,16 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    in which case the topology can be anything, or perform ND proxy
    operations, in which case the structure of links must be strictly
    hierarchical to avoid loops.
+
+
+
+
+
+
+
+
+
+
 
 
 
