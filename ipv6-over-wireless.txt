@@ -115,13 +115,14 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
        5.4.2.  Using Wireless ND . . . . . . . . . . . . . . . . . .  34
-   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  39
-   7.  Coexistence with ND-Classic . . . . . . . . . . . . . . . . .  39
-   8.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .  42
-   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  43
-   10. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  43
-   11. Normative References  . . . . . . . . . . . . . . . . . . . .  44
-   12. Informative References  . . . . . . . . . . . . . . . . . . .  45
+   6.  Coexistence with ND-Classic . . . . . . . . . . . . . . . . .  39
+   7.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .  42
+   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  43
+   9.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  43
+   10. Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  43
+   11. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  43
+   12. Normative References  . . . . . . . . . . . . . . . . . . . .  44
+   13. Informative References  . . . . . . . . . . . . . . . . . . .  45
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  49
 
 1.  Introduction
@@ -161,7 +162,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    This document presents an architecture for IPv6 access networks that
    decouples the lower-layer concepts of links and broadcast domains
    from the IP concepts of Links and Subnets, and limits the use and
-   impact of broadcast.  This architecture is suitable for IPv6 over any
 
 
 
@@ -170,6 +170,7 @@ Thubert & Richardson    Expires 8 September 2023                [Page 3]
 Internet-Draft               IPv6 over NBMA                   March 2023
 
 
+   impact of broadcast.  This architecture is suitable for IPv6 over any
    network, including modern Non-Broadcast MultiAccess (NBMA) and non-
    transitive Point-to-Multipoint (P2MP) networks.  A study of the
    issues with ND-Classic over wireless media is presented, and a
@@ -213,7 +214,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    in early switches, and still does not make much economical sense
    today when a complete ND cache in the not-onlink mode of ND requires
    one state per addreses in every router as opposed to every switch.
-
 
 
 
@@ -1554,7 +1554,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    of registered address and respond to DAD and lookups from legacy
    nodes, and prevent registering nodes from autoconfiguring addresses
    that exist in legacy nodes by performing DAD on behalf of the
-   registering nodes, more in Section 7.
+   registering nodes, more in Section 6.
 
 
 
@@ -2130,11 +2130,7 @@ Thubert & Richardson    Expires 8 September 2023               [Page 38]
 Internet-Draft               IPv6 over NBMA                   March 2023
 
 
-6.  IANA Considerations
-
-   This specification does not require IANA action.
-
-7.  Coexistence with ND-Classic
+6.  Coexistence with ND-Classic
 
    The framework allows for a mixed environment with both models, ND-
    Classic and SFAAC, coexist.  With [RFC8929], an ethernet backbone
@@ -2150,6 +2146,10 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    IPv6 address to be used before completion of DAD, so the whole flow
    below can happen in the milliseconds that follow the Wi-Fi
    association.
+
+
+
+
 
 
 
@@ -2333,7 +2333,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
            Figure 8: Initial Registration Flow with 6BBR ND-Proxy
 
-8.  Privacy Considerations
+7.  Privacy Considerations
 
    ND-Classic exposes all addresses to all nodes in the Subnet, which is
    a privacy issue and makes impersonation attacks easier.  In contrast,
@@ -2369,7 +2369,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    a DCI environment, the inter-side (SD-WAN) links are typically
    encrypted, to the exchanges are obfuscated from an on-path listener.
 
-9.  Security Considerations
+8.  Security Considerations
 
    The registration model [RFC8505] implemented by this framework allows
    for a model where the ingress routers have a full knowledge of all
@@ -2388,11 +2388,27 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    allows to disable the proprietary middlebox software aimed at
    protecting the address ownership against onlink rogues.
 
-10.  Acknowledgments
+9.  IANA Considerations
+
+   This specification does not require IANA action.
+
+10.  Contributors
+
+   Brian Carpenter  Provided support, hints, and text snippets
+      throughout the lifetime of the I-Draft
+
+11.  Acknowledgments
 
    Many thanks to the participants of the 6lo WG where a lot of the work
    discussed here happened, following work at ROLL, 6TiSCH, and mainly
    6LoWPAN.
+
+
+
+Thubert & Richardson    Expires 8 September 2023               [Page 43]
+
+Internet-Draft               IPv6 over NBMA                   March 2023
+
 
    Special thanks to Brian Carpenter and Eric Levy-Abegnoli who provided
    support and useful comments throughout the development of this
@@ -2402,15 +2418,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    Also many thanks to Eduard Vasilenko, XiPeng Xiao, for their
    contributions and support to this work at 6MAN, v6Ops, and ETSI IPE.
 
-
-
-
-Thubert & Richardson    Expires 8 September 2023               [Page 43]
-
-Internet-Draft               IPv6 over NBMA                   March 2023
-
-
-11.  Normative References
+12.  Normative References
 
    [RFC3963]  Devarapalli, V., Wakikawa, R., Petrescu, A., and P.
               Thubert, "Network Mobility (NEMO) Basic Support Protocol",
@@ -2450,14 +2458,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
               DOI 10.17487/RFC6830, January 2013,
               <https://www.rfc-editor.org/info/rfc6830>.
 
-   [RFC8200]  Deering, S. and R. Hinden, "Internet Protocol, Version 6
-              (IPv6) Specification", STD 86, RFC 8200,
-              DOI 10.17487/RFC8200, July 2017,
-              <https://www.rfc-editor.org/info/rfc8200>.
-
-
-
-
 
 
 
@@ -2465,6 +2465,11 @@ Thubert & Richardson    Expires 8 September 2023               [Page 44]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
+
+   [RFC8200]  Deering, S. and R. Hinden, "Internet Protocol, Version 6
+              (IPv6) Specification", STD 86, RFC 8200,
+              DOI 10.17487/RFC8200, July 2017,
+              <https://www.rfc-editor.org/info/rfc8200>.
 
    [RFC8505]  Thubert, P., Ed., Nordmark, E., Chakrabarti, S., and C.
               Perkins, "Registration Extensions for IPv6 over Low-Power
@@ -2481,7 +2486,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
               "IPv6 Backbone Router", RFC 8929, DOI 10.17487/RFC8929,
               November 2020, <https://www.rfc-editor.org/info/rfc8929>.
 
-12.  Informative References
+13.  Informative References
 
    [RFC3810]  Vida, R., Ed. and L. Costa, Ed., "Multicast Listener
               Discovery Version 2 (MLDv2) for IPv6", RFC 3810,
@@ -2507,11 +2512,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
               DOI 10.17487/RFC6550, March 2012,
               <https://www.rfc-editor.org/info/rfc6550>.
 
-   [RFC6775]  Shelby, Z., Ed., Chakrabarti, S., Nordmark, E., and C.
-              Bormann, "Neighbor Discovery Optimization for IPv6 over
-              Low-Power Wireless Personal Area Networks (6LoWPANs)",
-              RFC 6775, DOI 10.17487/RFC6775, November 2012,
-              <https://www.rfc-editor.org/info/rfc6775>.
 
 
 
@@ -2521,6 +2521,12 @@ Thubert & Richardson    Expires 8 September 2023               [Page 45]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
+
+   [RFC6775]  Shelby, Z., Ed., Chakrabarti, S., Nordmark, E., and C.
+              Bormann, "Neighbor Discovery Optimization for IPv6 over
+              Low-Power Wireless Personal Area Networks (6LoWPANs)",
+              RFC 6775, DOI 10.17487/RFC6775, November 2012,
+              <https://www.rfc-editor.org/info/rfc6775>.
 
    [RFC7668]  Nieminen, J., Savolainen, T., Isomaki, M., Patil, B.,
               Shelby, Z., and C. Gomez, "IPv6 over BLUETOOTH(R) Low
@@ -2560,12 +2566,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
               DOI 10.17487/RFC8981, February 2021,
               <https://www.rfc-editor.org/info/rfc8981>.
 
-   [I-D.ietf-rift-rift]
-              Przygienda, T., Sharma, A., Thubert, P., Rijsman, B.,
-              Afanasiev, D., and J. Head, "RIFT: Routing in Fat Trees",
-              Work in Progress, Internet-Draft, draft-ietf-rift-rift-16,
-              12 September 2022, <https://datatracker.ietf.org/doc/html/
-              draft-ietf-rift-rift-16>.
 
 
 
@@ -2577,6 +2577,13 @@ Thubert & Richardson    Expires 8 September 2023               [Page 46]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
+
+   [I-D.ietf-rift-rift]
+              Przygienda, T., Sharma, A., Thubert, P., Rijsman, B.,
+              Afanasiev, D., and J. Head, "RIFT: Routing in Fat Trees",
+              Work in Progress, Internet-Draft, draft-ietf-rift-rift-16,
+              12 September 2022, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-rift-rift-16>.
 
    [RFC9010]  Thubert, P., Ed. and M. Richardson, "Routing for RPL
               (Routing Protocol for Low-Power and Lossy Networks)
@@ -2618,13 +2625,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
               <https://datatracker.ietf.org/doc/html/draft-bi-savi-wlan-
               24>.
 
-   [UNICAST AR]
-              Thubert, P. and E. Levy-Abegnoli, "IPv6 Neighbor Discovery
-              Unicast Lookup", Work in Progress, Internet-Draft, draft-
-              thubert-6lo-unicast-lookup-02, 8 November 2021,
-              <https://datatracker.ietf.org/doc/html/draft-thubert-6lo-
-              unicast-lookup-02>.
-
 
 
 
@@ -2633,6 +2633,13 @@ Thubert & Richardson    Expires 8 September 2023               [Page 47]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
+
+   [UNICAST AR]
+              Thubert, P. and E. Levy-Abegnoli, "IPv6 Neighbor Discovery
+              Unicast Lookup", Work in Progress, Internet-Draft, draft-
+              thubert-6lo-unicast-lookup-02, 8 November 2021,
+              <https://datatracker.ietf.org/doc/html/draft-thubert-6lo-
+              unicast-lookup-02>.
 
    [PREFIX REGISTRATION]
               Thubert, P., "IPv6 Neighbor Discovery Prefix
@@ -2675,13 +2682,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
               metropolitan area networks-- Specific requirements Part
               11: Wireless LAN Medium Access Control (MAC) and Physical
               Layer (PHY) Specifications".
-
-
-
-
-
-
-
 
 
 

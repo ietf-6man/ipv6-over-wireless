@@ -1103,11 +1103,6 @@ As opposed to unicast addresses, there is no concept of duplication multicast an
    </section><!--Case of DMB radios-->
    </section><!--IPv6 Over Wireless-->
 
-   <section > <name>IANA Considerations</name>
-      <t>
-         This specification does not require IANA action.
-      </t>
-   </section>
 
    <section  anchor='coex' > <name>Coexistence with ND-Classic</name>
       <t>
@@ -1229,6 +1224,18 @@ In other words, the 6BBRs collectively form a global registrar for the Subnet th
       This defeats the classical impersonation attacks against ND-Classic and allows to disable the proprietary middlebox software aimed at protecting the address ownership against onlink rogues.
       </t>
    </section><!-- "Security Considerations" -->
+
+   <section > <name>IANA Considerations</name>
+      <t>
+         This specification does not require IANA action.
+      </t>
+   </section>
+
+   <section > <name>Contributors</name>
+      <dl>
+      <dt>Brian Carpenter</dt><dd>Provided support, hints, and text snippets throughout the lifetime of the I-Draft</dd>
+      </dl>
+   </section>
 
    <section > <name>Acknowledgments</name>
    <t>Many thanks to the participants of the 6lo WG where a lot of the work discussed here happened, following work at ROLL, 6TiSCH, and mainly 6LoWPAN.
