@@ -2007,7 +2007,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    RSU as CareOf Address.
 
    As opposed to unicast addresses, there is no concept of duplication
-   multicast and anycast addresses, and there might be multiple
+   with multicast and anycast addresses, and there might be multiple
    registrations from multiple parties for the same address.  The router
    conserves one registration per party per multicast or anycast
 
