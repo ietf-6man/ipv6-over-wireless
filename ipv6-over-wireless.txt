@@ -533,24 +533,24 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 2.5.  Security and Privacy
 
-   Broadcasting NS and NA messages exposes the source and the Target
+   Broadcasting ND_Classic messages expose the source and the Target
    addresses to the whole network, including nodes that do not need to
-   know that the source is present on the network.  A passive listener
-   may discover the addresses without any positive action or possibility
-   of control by the source.  A more private approach has each node see
-   and connect to only a subset of the routers using the not-onlink
-   model, leaving the source the capability to shortcut to the
-   destination based on redirect messages from the router, provided that
-   the source wishes to do so.
+   know that those addresses are present in the network.  A passive
+   listener may discover the addresses without any observable action or
+   possibility of control by the source.  Once it has discovered the
+   presence of neighbor addresses, the onlink attacker can impersonate
+   any host in the network, either by sourcing packets with a stolen
+   address, or by overriding the neighbor caches with a NA that
+   indicates the attacker's Link-Layer Address.
 
-   Once it has discovered the presence of neighbor addresses, it becomes
-   easy for the onlink attacker to impersonate any host in the network,
-   either by sourcing packets with a stolen address, or by overriding
-   the neighbor caches with a NA that indicates the attacker's LLA.  It
-   is thus desirable to avoid exposing the host IPv6 address in
-   broadcast ND messages.  Additionally, it is desirable that only the
-   address owner can source packets with that address, and that another
-   party may not be able to claim and use that address.
+   It is thus desirable to avoid exposing the host IPv6 address in
+   broadcast ND messages.  A more private approach has each node see and
+   connect to only a subset of the routers using the not-onlink model.
+   The source may still shortcut to the destination when the destination
+   is effectively on link, based on redirect messages from the router,
+   when desirable.  Additionally, it is desirable that only the address
+   owner can source packets with that address, and that another party
+   may not be able to claim and use that address.
 
 
 
@@ -565,32 +565,32 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    The reactive NS lookup method can also be leveraged from the outside
    of the network to perform DOS attacks on constrained resources in the
    network.  The attacker just needs to forge any random address from
-   the subnet prefix and send the packet.  The Subnet ingress router
-   will have to store that packet for the duration of the lookup time,
-   and broadcast an NS to lookup the forged address.  This both locks
-   memory in the router and consumes bandwidth and energy, impacting all
-   nodes in the Subnet.
+   the subnet prefix and send one packet to that random address.  The
+   Subnet ingress router will have to store that packet for the duration
+   of the lookup time, and broadcast an NS to lookup the forged address.
+   This both locks memory in the router and consumes bandwidth and
+   energy, impacting all nodes in the Subnet.
 
    To avoid the lookup delays and associated attacks, it makes sense to
    use a proactive method whereby the router knows all the address
-   mappings in advance, so that if the destination address is not
-   present in the router tables, then the destination does not exist in
-   the network and the packet can safely be dropped by the forwarding
-   engine.
+   mappings in advance.  When that is achieved, if the destination
+   address of an incoming packet is not present in the router tables,
+   then the destination does not exist in the network and the packet can
+   safely be dropped by the forwarding engine, e.g., in hardware.
 
 2.6.  More Middleboxes
 
-   The above problems have been observed fat least since the early
-   2000s.  A number of actions were taken.  For instance, IEEE std
-   802.11 [IEEE Std. 802.11] mandates the support of a middlebox
-   operation called "ARP proxy" for IPv4 and IPv6 in the Access Point
-   (AP).  The "ARP Proxy" cancels broadcasts over a BSS when the IP
-   Target of the ARP/ND message is not owned by a STA associated to the
-   AP.  With IPv4, the expectation is that the STA owns exactly one IP
-   address, and that the address is obtained via DHCP right after the
-   association, so it is simple and deterministic to snoop the address
-   in the DHCP exchange (as long as it remains in the clear) and cancel
-   undesirable ARP lookups.
+   The above problems have been observed at least since the early 2000s.
+   A number of actions were taken.  For instance, IEEE std 802.11 [IEEE
+   Std. 802.11] mandates the support of a middlebox operation called
+   "ARP proxy" for IPv4 and IPv6 in the Access Point (AP).  The "ARP
+   Proxy" cancels broadcasts over a BSS when the IP Target of the ARP/ND
+   message is not owned by a STA associated to the AP.  With IPv4, the
+   expectation is that the STA owns exactly one IP address, and that the
+   address is obtained via DHCP right after the association, so it is
+   simple and deterministic to snoop the address in the DHCP exchange
+   (as long as it remains in the clear) and cancel undesirable ARP
+   lookups.
 
    In contrast to IPv4, IPv6 enables a node to form multiple addresses,
    some of them temporary and with a particular attention paid to
@@ -618,26 +618,28 @@ Thubert & Richardson    Expires 8 September 2023               [Page 11]
 Internet-Draft               IPv6 over NBMA                   March 2023
 
 
-   scope from multicast to unicast.  Based on the snooped information,
-   the middlebox may for instance drop an RA message that appears to be
-   coming from a host (e.g., as inferred because it is received on a
-   wireless adapter), or an NA message coming from a device that does
-   not appear to be the owner.  But, for the lack of an explicit
-   contract between the host and the middlebox, the middlebox cannot
-   determine who the real owner is, and it may deny a rightful user.
+   link-layer scope from broadcast to unicast.  Based on the snooped
+   information, the middlebox may for instance drop an RA message that
+   appears to be coming from a host (e.g., as inferred because it is
+   received on a wireless adapter), or an NA message coming from a
+   device that does not appear to be the owner.  But, for the lack of an
+   explicit contract between the host and the middlebox, the middlebox
+   cannot determine who the real owner is, and it may deny a rightful
+   user.
 
-   The middlebox may also block SLAAC from a host above a fixed number
-   of addresses, to protect the network resources (addresses are an
-   expensive and thus limited resource in a managed network) unbeknownst
-   to the host.  When that happens, the host believes that it can use
-   the address but fails to connect with it.  This might happen even if
-   the host has ceased to use other addresses and is now within the
-   allowed quota.  Classic-ND lacks both a method for the host to know
-   how many addresses it can own, and a method for the router to know
-   which addresses the host uses at any point of time.  The
-   infrastructure needs a deterministic knowledge of the addresses in
-   use, and for that a contract must be passed between the host and the
-   network to ensure that the all the addresses are known and usable.
+   In a managed network, IP addresses are an expensive and thus a
+   limited resource.  To ensure a fair use and protect against DOS
+   attacks, the middlebox may also block Stateless Address
+   Autoconfiguration (SLAAC) from a host above a fixed number of
+   addresses.  When that happens, the host believes that it can use the
+   address but fails to connect with it.  This might happen even if the
+   host has ceased to use other addresses and is now within the allowed
+   quota.  Classic-ND lacks both a method for the host to know how many
+   addresses it can own, and a method for the router to know which
+   addresses the host uses at any point of time.  The infrastructure
+   needs a deterministic knowledge of the addresses in use, and for that
+   a contract must be passed between the host and the network to ensure
+   that the all the addresses are known and usable.
 
    Maybe the most insidious side effect of those middleboxes is that as
    opposed to NAT, their operation is obfuscated and proprietary.  From
@@ -663,9 +665,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    and a reactive operation for AR and DAD that requires an extensive
    use of broadcast.  While IPv4 and IPv6 behaviors are similar for
    addresses obtained via DHCP, the cost of AR and DAD makes IPv6
-   significantly more expensive when Stateless Address Autoconfiguration
-   (SLAAC) is used.
-
+   significantly more expensive than IPv4 when SLAAC is enabled.
 
 
 
@@ -676,11 +676,10 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
    And while IPv4 supported NBMA and P2MP models (e.g., on Frame Relay
    leveraging OSPFv2), the IPv6 promise to support NBMA (for ATM)
-   remained unmet to this day, and only P2P and Transit links are
-   properly supported by ND-Classic.  For those reasons, as well as
-   inherent complexity and unpredictability, IPv6 with SLAAC can be
-   significantly less attractive than IPv4 to some network
-   administrators.
+   remains unmet to this day, as only P2P and Transit links are properly
+   supported by ND-Classic.  For those reasons, as well as inherent
+   complexity and unpredictability, IPv6 with SLAAC can be significantly
+   less attractive than IPv4 to some network administrators.
 
    ND-Classic exposes all addresses to all nodes in the network, which
    is unfit for privacy.  It is prone to DOS attacks from outside the
@@ -704,13 +703,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    and sustainability.  Devices must be always attached and always
    powered on to answer AR and DAD messages, which makes ND-Classic
    inapplicable to constrained IoT devices that sleep for the vast
-   majority of their time.  The key design points in this architecture
-   derive from the original observations made at the 6LoWPAN WG for
-   constrained devices and networks, and focus on avoiding waste of
-   limited resources such as spectrum and energy, by using broadcasts
-   only when broadcast is really needed, and decoupling the IP
-   abstraction of a Subnet from the broadcast domains to avoid Subnet-
-   wide broadcast storms.
+   majority of their time.
 
 3.  An Architecture for IPv6 over Non-Broadcast Networks
 
@@ -721,7 +714,14 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    networks, as well as other Non-Broadcast Multi-Access (NBMA) networks
    such as Data-Center overlays and more generally as a replacement to
    the ND-Classic protocol in any network where the issues discussed in
-   Section 2 are detrimental to the network operation.  The architecture
+   Section 2 are detrimental to the network operation.
+
+   The key design points in this architecture derive from the original
+   observations made at the 6LoWPAN WG for constrained devices and
+   networks, and focus on avoiding waste of limited resources such as
+   spectrum and energy, by using broadcasts only when broadcast is
+   really needed, and decoupling the IP abstraction of a Subnet from the
+   broadcast domains to avoid Subnet-wide broadcast storms.
 
 
 
@@ -730,9 +730,9 @@ Thubert & Richardson    Expires 8 September 2023               [Page 13]
 Internet-Draft               IPv6 over NBMA                   March 2023
 
 
-   leverages the not-onlink model and routing inside the subnet, which
-   enables to form potentially large MLSNs without creating a large
-   broadcast domain at the link-layer.
+   The architecture leverages the not-onlink model and routing inside
+   the subnet, which enables to form potentially large MLSNs without
+   creating a large broadcast domain at the link-layer.
 
    To support the deployment agility that virtual (e.g., VxLAN overlays
    and pseudowires) and intangible (e.g., wireless, laser, and quantum)
