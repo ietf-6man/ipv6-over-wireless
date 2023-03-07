@@ -6,11 +6,11 @@
 Internet-Draft                                             Cisco Systems
 Updates: RFC4291 (if approved)                             M. Richardson
 Intended status: Informational                                 Sandelman
-Expires: 7 September 2023                                   6 March 2023
+Expires: 8 September 2023                                   7 March 2023
 
 
      Architecture and Framework for IPv6 over Non-Broadcast Access
-                draft-thubert-6man-ipv6-over-wireless-14
+                draft-thubert-6man-ipv6-over-wireless-15
 
 Abstract
 
@@ -37,7 +37,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 7 September 2023.
+   This Internet-Draft will expire on 8 September 2023.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Thubert & Richardson    Expires 7 September 2023                [Page 1]
+Thubert & Richardson    Expires 8 September 2023                [Page 1]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -109,30 +109,30 @@ Table of Contents
 
 
 
-Thubert & Richardson    Expires 7 September 2023                [Page 2]
+Thubert & Richardson    Expires 8 September 2023                [Page 2]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
 
        5.4.2.  Using Wireless ND . . . . . . . . . . . . . . . . . .  34
-   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  37
-   7.  Coexistence with ND-Classic . . . . . . . . . . . . . . . . .  38
-   8.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .  41
-   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  42
-   10. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  42
-   11. Normative References  . . . . . . . . . . . . . . . . . . . .  43
-   12. Informative References  . . . . . . . . . . . . . . . . . . .  44
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  48
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  39
+   7.  Coexistence with ND-Classic . . . . . . . . . . . . . . . . .  39
+   8.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .  42
+   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  43
+   10. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  43
+   11. Normative References  . . . . . . . . . . . . . . . . . . . .  44
+   12. Informative References  . . . . . . . . . . . . . . . . . . .  45
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  49
 
 1.  Introduction
 
    IEEE Std. 802.1 [IEEE Std. 802.1] Ethernet Bridging provides an
    efficient and reliable broadcast service for wired networks;
-   applications aND-Classics have been built that heavily depend on that
-   feature for their core operation.  Unfortunately, Low-Power Lossy
-   Networks (LLNs) and Wireless Local Area Networks (WLANs) generally do
-   not benefit from the same reliable and cheap broadcast capabilities
-   as Ethernet links.  .
+   applications and protocols have been built that heavily depend on
+   that feature for their core operation.  Unfortunately, Low-Power
+   Lossy Networks (LLNs) and Wireless Local Area Networks (WLANs)
+   generally do not benefit from the same reliable and cheap broadcast
+   capabilities as Ethernet links.  .
 
    Similarly, the use of broadcast is discouraged in large Data Center
    (DC) fabrics and DC Interconnect (DCI) that extend the lower layer
@@ -165,7 +165,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023                [Page 3]
+Thubert & Richardson    Expires 8 September 2023                [Page 3]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -221,7 +221,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023                [Page 4]
+Thubert & Richardson    Expires 8 September 2023                [Page 4]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -277,7 +277,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023                [Page 5]
+Thubert & Richardson    Expires 8 September 2023                [Page 5]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -333,7 +333,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023                [Page 6]
+Thubert & Richardson    Expires 8 September 2023                [Page 6]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -389,7 +389,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023                [Page 7]
+Thubert & Richardson    Expires 8 September 2023                [Page 7]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -445,7 +445,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023                [Page 8]
+Thubert & Richardson    Expires 8 September 2023                [Page 8]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -501,7 +501,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023                [Page 9]
+Thubert & Richardson    Expires 8 September 2023                [Page 9]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -557,7 +557,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 10]
+Thubert & Richardson    Expires 8 September 2023               [Page 10]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -613,7 +613,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 11]
+Thubert & Richardson    Expires 8 September 2023               [Page 11]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -669,7 +669,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 12]
+Thubert & Richardson    Expires 8 September 2023               [Page 12]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -725,7 +725,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 13]
+Thubert & Richardson    Expires 8 September 2023               [Page 13]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -781,7 +781,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 14]
+Thubert & Richardson    Expires 8 September 2023               [Page 14]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -837,7 +837,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 15]
+Thubert & Richardson    Expires 8 September 2023               [Page 15]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -893,7 +893,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 16]
+Thubert & Richardson    Expires 8 September 2023               [Page 16]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -949,7 +949,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 17]
+Thubert & Richardson    Expires 8 September 2023               [Page 17]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1005,7 +1005,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 18]
+Thubert & Richardson    Expires 8 September 2023               [Page 18]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1061,7 +1061,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 19]
+Thubert & Richardson    Expires 8 September 2023               [Page 19]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1117,7 +1117,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 20]
+Thubert & Richardson    Expires 8 September 2023               [Page 20]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1173,7 +1173,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 21]
+Thubert & Richardson    Expires 8 September 2023               [Page 21]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1229,7 +1229,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 22]
+Thubert & Richardson    Expires 8 September 2023               [Page 22]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1285,7 +1285,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 23]
+Thubert & Richardson    Expires 8 September 2023               [Page 23]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1341,7 +1341,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 24]
+Thubert & Richardson    Expires 8 September 2023               [Page 24]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1397,7 +1397,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 25]
+Thubert & Richardson    Expires 8 September 2023               [Page 25]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1453,7 +1453,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 26]
+Thubert & Richardson    Expires 8 September 2023               [Page 26]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1509,7 +1509,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 27]
+Thubert & Richardson    Expires 8 September 2023               [Page 27]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1565,7 +1565,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 28]
+Thubert & Richardson    Expires 8 September 2023               [Page 28]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1621,7 +1621,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 29]
+Thubert & Richardson    Expires 8 September 2023               [Page 29]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1677,7 +1677,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 30]
+Thubert & Richardson    Expires 8 September 2023               [Page 30]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1733,7 +1733,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 31]
+Thubert & Richardson    Expires 8 September 2023               [Page 31]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1789,7 +1789,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 32]
+Thubert & Richardson    Expires 8 September 2023               [Page 32]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1845,7 +1845,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 33]
+Thubert & Richardson    Expires 8 September 2023               [Page 33]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1901,7 +1901,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 34]
+Thubert & Richardson    Expires 8 September 2023               [Page 34]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -1957,12 +1957,11 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 35]
+Thubert & Richardson    Expires 8 September 2023               [Page 35]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
 
-       6LoWPAN Node           6LR             6LBR
          (host)             (router)       (registrar)
             |                  |               |
             |                  |               |
@@ -2007,72 +2006,133 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    their own prefix using their address derived from the prefix of the
    RSU as CareOf Address.
 
+   As opposed to unicast addresses, there is no concept of duplication
+   multicast and anycast addresses, and there might be multiple
+   registrations from multiple parties for the same address.  The router
+   conserves one registration per party per multicast or anycast
 
 
 
-
-
-
-Thubert & Richardson    Expires 7 September 2023               [Page 36]
+Thubert & Richardson    Expires 8 September 2023               [Page 36]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
 
-   For multicast and anycast addresses, there is no concept of
-   duplication, and there might be multiple registrations from multiple
-   parties for the same address.  The router conserves one registration
-   per party per multicast or anycast address, but injects the route
-   into the SGP only once for each address.
+   address, but injects the route into the SGP only once for each
+   address, asynchronously to the registration.  On the other hand, the
+   validation exchange with the registrar is still needed if the router
+   checks the right for the host to listen to the anycast or multicast
+   address.
 
-         (host1)           (router)
-            |                  |
-            |   DMB link       |
-            |                  |
-            |  ND-Classic RS   |
-            |----------------->|
-            |------------>     |
-            |------------------------>
-            |  ND-Classic RA   |
-            |<-----------------|
-            |                  |
-            |  NS(EARO)        |
-            |----------------->|
-            |                  |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Thubert & Richardson    Expires 8 September 2023               [Page 37]
+
+Internet-Draft               IPv6 over NBMA                   March 2023
+
+
+       6LoWPAN Node           6LR             6LBR
+         (host1)           (router)        (registrar)
+            |                  |               |
+            |   DMB link       |               |
+            |                  |               |
+            |  ND-Classic RS   |               |
+            |----------------->|               |
+            |------------>     |               |
+            |------------------------>         |
+            |  ND-Classic RA   |               |
+            |<-----------------|               |
+            |                  |               |
+            |  NS(EARO)        |               |
+            |----------------->|               |
+            |                  | Extended DAR  |
+            |                  |-------------->|
+            |                  |               |
+            |                  | Extended DAC  |
+            |                  |<--------------|
             |        NA(EARO)  |
             |<-----------------|<inject in SGP> ->
             |                  |
                       ...
-         (host2)           (router)
-            |  NS(EARO)        |
-            |----------------->|
-            |                  |
-            |        NA(EARO)  |
-            |<-----------------|
+         (host2)           (router)           6LBR
+            |  NS(EARO)        |               |
+            |----------------->|               |
+            |                  |               |
+            |                  | Extended DAR  |
+            |                  |-------------->|
+            |                  |               |
+            |                  | Extended DAC  |
+            |                  |<--------------|
+            |        NA(EARO)  |               |
+            |<-----------------|               |
                       ...
          (host1)           (router)
-            |  NS(EARO)        |
-            |----------------->|
-            |                  |
-            |        NA(EARO)  |
-            |<-----------------|
+            |  NS(EARO)        |               |
+            |----------------->|               |
+            |                  |               |
+            |        NA(EARO)  |               |
+            |<-----------------|               |
                       ...
             |                  |<maintain in SGP> ->
                       ...
 
-            Figure 6: Registration Flow for a Link-Local Address
+      Figure 6: Registration Flow for an anycast or multicast Address
+
+
+
+
+
+Thubert & Richardson    Expires 8 September 2023               [Page 38]
+
+Internet-Draft               IPv6 over NBMA                   March 2023
+
 
 6.  IANA Considerations
 
    This specification does not require IANA action.
-
-
-
-
-
-Thubert & Richardson    Expires 7 September 2023               [Page 37]
-
-Internet-Draft               IPv6 over NBMA                   March 2023
-
 
 7.  Coexistence with ND-Classic
 
@@ -2121,11 +2181,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-
-
-
-
-Thubert & Richardson    Expires 7 September 2023               [Page 38]
+Thubert & Richardson    Expires 8 September 2023               [Page 39]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -2181,7 +2237,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 39]
+Thubert & Richardson    Expires 8 September 2023               [Page 40]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -2237,7 +2293,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 40]
+Thubert & Richardson    Expires 8 September 2023               [Page 41]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -2293,7 +2349,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 41]
+Thubert & Richardson    Expires 8 September 2023               [Page 42]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -2349,7 +2405,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 42]
+Thubert & Richardson    Expires 8 September 2023               [Page 43]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -2405,7 +2461,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 43]
+Thubert & Richardson    Expires 8 September 2023               [Page 44]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -2461,7 +2517,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 44]
+Thubert & Richardson    Expires 8 September 2023               [Page 45]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -2517,7 +2573,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 45]
+Thubert & Richardson    Expires 8 September 2023               [Page 46]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -2573,7 +2629,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 46]
+Thubert & Richardson    Expires 8 September 2023               [Page 47]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -2629,7 +2685,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 47]
+Thubert & Richardson    Expires 8 September 2023               [Page 48]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
@@ -2685,4 +2741,4 @@ Authors' Addresses
 
 
 
-Thubert & Richardson    Expires 7 September 2023               [Page 48]
+Thubert & Richardson    Expires 8 September 2023               [Page 49]

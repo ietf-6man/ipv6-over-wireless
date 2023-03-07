@@ -14,7 +14,7 @@
 <?rfc authorship="yes"?>
 <?rfc tocappendix="yes"?>
 <rfc  xmlns:xi="http://www.w3.org/2001/XInclude" category="info" ipr='trust200902' tocInclude="true"  obsoletes=""
-updates="RFC4291" consensus="true" submissionType="IETF" xml:lang="en" version="3" docName="draft-thubert-6man-ipv6-over-wireless-14" >
+updates="RFC4291" consensus="true" submissionType="IETF" xml:lang="en" version="3" docName="draft-thubert-6man-ipv6-over-wireless-15" >
 
 <front>
   <title abbrev="IPv6 over NBMA">Architecture and Framework for IPv6 over Non-Broadcast Access</title>
@@ -67,7 +67,7 @@ updates="RFC4291" consensus="true" submissionType="IETF" xml:lang="en" version="
     <t>
 	<xref target="IEEEstd8021">IEEE Std. 802.1</xref> Ethernet Bridging
 	provides an efficient and reliable broadcast service for wired networks;
-    applications aND-Classics have been built that heavily depend on that
+    applications and protocols have been built that heavily depend on that
     feature for their core operation.
     Unfortunately, Low-Power Lossy Networks (LLNs) and Wireless Local Area
     Networks (WLANs) generally do not benefit from the same reliable and cheap
@@ -1009,7 +1009,6 @@ P2P links may be federated in Hub-and-Spoke by edge routers, and the Subnet may 
 
 <figure anchor='figReg2'> <name>RFC 8505 Registration Flow for a Global Address</name>
  <artwork><![CDATA[
-    6LoWPAN Node           6LR             6LBR
       (host)             (router)       (registrar)
          |                  |               |
          |                  |               |
@@ -1049,43 +1048,52 @@ P2P links may be federated in Hub-and-Spoke by edge routers, and the Subnet may 
 An example Hub-and-Spoke is an OCB Road-Side Unit (RSU) that owns a prefix, provides Internet connectivity using that prefix to On-Board Units (OBUs) within its physical broadcast domain. An example of Route-Over MLSN is a collection of cars in a parking lot operating RPL to extend the connectivity provided by the RSU beyond its physical broadcast domain. Cars may then operate NEMO <xref target="RFC3963"/> for their own prefix using their address derived from the prefix of the RSU as CareOf Address.
 </t>
 <t>
-
-For multicast and anycast addresses, there is no concept of duplication, and there might be multiple registrations from multiple parties for the same address. The router conserves one registration per party per multicast or anycast address, but injects the route into the SGP only once for each address.
+As opposed to unicast addresses, there is no concept of duplication multicast and anycast addresses, and there might be multiple registrations from multiple parties for the same address. The router conserves one registration per party per multicast or anycast address, but injects the route into the SGP only once for each address, asynchronously to the registration. On the other hand, the validation exchange with the registrar is still needed if the router checks the right for the host to listen to the anycast or  multicast address.
 </t>
 
-<figure anchor='figSub'><name> Registration Flow for a Link-Local Address</name>
+<figure anchor='figSub'><name> Registration Flow for an anycast or multicast Address</name>
  <artwork><![CDATA[
-      (host1)           (router)
-         |                  |
-         |   DMB link       |
-         |                  |
-         |  ND-Classic RS   |
-         |----------------->|
-         |------------>     |
-         |------------------------>
-         |  ND-Classic RA   |
-         |<-----------------|
-         |                  |
-         |  NS(EARO)        |
-         |----------------->|
-         |                  |
+    6LoWPAN Node           6LR             6LBR
+      (host1)           (router)        (registrar)
+         |                  |               |
+         |   DMB link       |               |
+         |                  |               |
+         |  ND-Classic RS   |               |
+         |----------------->|               |
+         |------------>     |               |
+         |------------------------>         |
+         |  ND-Classic RA   |               |
+         |<-----------------|               |
+         |                  |               |
+         |  NS(EARO)        |               |
+         |----------------->|               |
+         |                  | Extended DAR  |
+         |                  |-------------->|
+         |                  |               |
+         |                  | Extended DAC  |
+         |                  |<--------------|
          |        NA(EARO)  |
          |<-----------------|<inject in SGP> ->
          |                  |
                    ...
-      (host2)           (router)
-         |  NS(EARO)        |
-         |----------------->|
-         |                  |
-         |        NA(EARO)  |
-         |<-----------------|
+      (host2)           (router)           6LBR
+         |  NS(EARO)        |               |
+         |----------------->|               |
+         |                  |               |
+         |                  | Extended DAR  |
+         |                  |-------------->|
+         |                  |               |
+         |                  | Extended DAC  |
+         |                  |<--------------|
+         |        NA(EARO)  |               |
+         |<-----------------|               |
                    ...
       (host1)           (router)
-         |  NS(EARO)        |
-         |----------------->|
-         |                  |
-         |        NA(EARO)  |
-         |<-----------------|
+         |  NS(EARO)        |               |
+         |----------------->|               |
+         |                  |               |
+         |        NA(EARO)  |               |
+         |<-----------------|               |
                    ...
          |                  |<maintain in SGP> ->
                    ...
