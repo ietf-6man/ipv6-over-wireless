@@ -10,7 +10,7 @@ Expires: 9 September 2023                                      Sandelman
 
 
      Architecture and Framework for IPv6 over Non-Broadcast Access
-                draft-thubert-6man-ipv6-over-wireless-15
+                 draft-ietf-6man-ipv6-over-wireless-01
 
 Abstract
 
@@ -1301,8 +1301,8 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
    For that reason, upper-layer protocols (ULPs) should tend to avoid
    the use of broadcast when operating over IEEE std 802.11 [IEEE Std.
-   802.11] as they already typically do over IEEE std 802.15.4
-   [IEEEstd802154].  To cope with these problems, APs may implement
+   802.11] as they already typically do over IEEE std 802.15.4 [IEEE
+   Std. 802.15.4].  To cope with these problems, APs may implement
    strategies such as turn a broadcast into a series of unicast
    transmissions, or drop the message altogether, which may impact the
    upper-layer protocols.  For instance, some APs may not copy Router
@@ -1755,7 +1755,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    *  A typical SmartGrid networks puts together Route-Over MLSNs that
       comprise thousands of IPv6 nodes.  The 6TiSCH architecture
       [RFC9030] presents the Route-Over model over an IEEE Std. 802.15.4
-      Time-Slotted Channel-Hopping (TSCH) [IEEEstd802154] mesh, and
+      Time-Slotted Channel-Hopping (TSCH) [IEEE Std. 802.15.4] mesh, and
       generalizes it for multiple other applications.
 
       Each node in a SmartGrid network may have tens to a hundred others
@@ -2763,11 +2763,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
               layer (PHY) Specifications for Wireless Personal Area
               Networks (WPANs)".
 
-   [IEEEstd802154]
-              IEEE standard for Information Technology, "IEEE Standard
-              for Local and metropolitan area networks -- Part 15.4:
-              Low-Rate Wireless Personal Area Networks (LR-WPANs)".
-
    [IEEE Std. 802.1]
               IEEE standard for Information Technology, "IEEE Standard
               for Information technology -- Telecommunications and
@@ -2793,6 +2788,11 @@ Authors' Addresses
 
    Email: mcr+ietf@sandelman.ca
    URI:   http://www.sandelman.ca/
+
+
+
+
+
 
 
 

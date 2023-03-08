@@ -14,7 +14,7 @@
 <?rfc authorship="yes"?>
 <?rfc tocappendix="yes"?>
 <rfc  xmlns:xi="http://www.w3.org/2001/XInclude" category="info" ipr='trust200902' tocInclude="true"  obsoletes=""
-updates="" consensus="true" submissionType="IETF" xml:lang="en" version="3" docName="draft-thubert-6man-ipv6-over-wireless-15" >
+updates="" consensus="true" submissionType="IETF" xml:lang="en" version="3" docName="draft-ietf-6man-ipv6-over-wireless-01" >
 
 <front>
   <title abbrev="IPv6 over NBMA">Architecture and Framework for IPv6 over Non-Broadcast Access</title>
@@ -630,7 +630,7 @@ It takes a particular effort to place a set of devices in a fashion that all the
    <section > <name>Link-layer Broadcast Emulations</name>
 
 <t>
-We call Direct MAC Broadcast (DMB) the transmission mode where the broadcast domain that is usable at the MAC layer is directly the physical broadcast domain. <xref target="IEEE802154">IEEE Std. 802.15.4</xref> and <xref target="IEEEstd80211">IEEE Std. 802.11</xref> OCB (for Out of the Context of a BSS) are examples of DMB radios. DMB networks provide mostly symmetric and non-transitive transmission. This contrasts with a number of link-layer Broadcast Emulation (LLBE) schemes that are described in this section.
+We call Direct MAC Broadcast (DMB) the transmission mode where the broadcast domain that is usable at the MAC layer is directly the physical broadcast domain. <xref target="IEEEstd802154">IEEE Std. 802.15.4</xref> and <xref target="IEEEstd80211">IEEE Std. 802.11</xref> OCB (for Out of the Context of a BSS) are examples of DMB radios. DMB networks provide mostly symmetric and non-transitive transmission. This contrasts with a number of link-layer Broadcast Emulation (LLBE) schemes that are described in this section.
 </t>
 <!--
 <t>
@@ -1253,7 +1253,7 @@ In other words, the 6BBRs collectively form a global registrar for the Subnet th
    <displayreference   target="I-D.vyncke-6man-mcast-not-efficient"     to="MCAST EFFICIENCY"/>
    <displayreference   target="I-D.ietf-mboned-ieee802-mcast-problems"  to="MCAST PROBLEMS"/>
    <displayreference   target="I-D.bi-savi-wlan"                        to="SAVI"/>
-   <displayreference   target="IEEE802154"                              to="IEEE Std. 802.15.4"/>
+   <displayreference   target="IEEEstd802154"                           to="IEEE Std. 802.15.4"/>
    <displayreference   target="IEEEstd8021"                             to="IEEE Std. 802.1"/>
    <displayreference   target="IEEEstd80211"                            to="IEEE Std. 802.11"/>
 
@@ -1301,7 +1301,7 @@ In other words, the 6BBRs collectively form a global registrar for the Subnet th
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.thubert-bess-secure-evpn-mac-signaling.xml'/>
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-6lo-multicast-registration.xml'/>
 
-      <reference anchor="IEEE802154">
+     <reference anchor="IEEEstd802154">
          <front>
             <title>IEEE Std. 802.15.4, Part. 15.4: Wireless Medium Access
             Control (MAC) and Physical layer (PHY) Specifications for Low-Rate
@@ -1348,18 +1348,6 @@ In other words, the 6BBRs collectively form a global registrar for the Subnet th
          </front>
       </reference>
 
-      <reference anchor="IEEEstd802154">
-         <front>
-            <title> IEEE Standard for Local and metropolitan area networks --
-                Part 15.4: Low-Rate Wireless Personal Area Networks (LR-WPANs)
-            </title>
-            <author>
-		<organization> IEEE standard for Information Technology
-		</organization>
-            </author>
-            <date/>
-         </front>
-      </reference>
 
       <reference anchor="IEEEstd8021">
          <front>
