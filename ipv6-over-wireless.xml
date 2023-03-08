@@ -770,7 +770,7 @@ This framework allows other implementations of the abstract concept of the regis
 
 
    </section><!-- "Implementing Stateful address Autoconfiguration" -->
-   <section > <name>links and link-local Addresses</name>
+   <section > <name>Links and Link-Local Addresses</name>
 <t>
 For link-local Addresses, DAD is typically performed between communicating pairs of nodes and an NCE can be populated with a single unicast exchange. In the case of a bridging proxies, though, the link-local traffic is bridged over the backbone and the DAD must proxied there as well.
 </t>
@@ -781,7 +781,7 @@ For instance, in the case of Bluetooth Low Energy (BLE) <xref target="RFC7668"/>
 On the other hand, the uniqueness of GUAs and ULAs is validated at the Subnet Level, using a logical registrar that is global to the Subnet.
 </t>
 
-   </section><!--SFAAC application to links and link-local Addresses-->
+   </section><!-- "Links and Link-Local Addresses" -->
 
 
    <section > <name>Subnets and Global Addresses</name>
