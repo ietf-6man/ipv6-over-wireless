@@ -75,9 +75,9 @@ Table of Contents
      2.7.  Summary of Issues . . . . . . . . . . . . . . . . . . . .  12
    3.  An Architecture for IPv6 over Non-Broadcast Networks  . . . .  13
      3.1.  Basic Concepts  . . . . . . . . . . . . . . . . . . . . .  13
-     3.2.  Acronyms  . . . . . . . . . . . . . . . . . . . . . . . .  16
+     3.2.  Acronyms  . . . . . . . . . . . . . . . . . . . . . . . .  15
      3.3.  Terminology . . . . . . . . . . . . . . . . . . . . . . .  16
-       3.3.1.  IP Links  . . . . . . . . . . . . . . . . . . . . . .  17
+       3.3.1.  IP Links  . . . . . . . . . . . . . . . . . . . . . .  16
        3.3.2.  IP Interfaces . . . . . . . . . . . . . . . . . . . .  18
        3.3.3.  IP Subnets  . . . . . . . . . . . . . . . . . . . . .  19
        3.3.4.  ND Proxies  . . . . . . . . . . . . . . . . . . . . .  21
@@ -85,11 +85,11 @@ Table of Contents
      3.4.  IP Models . . . . . . . . . . . . . . . . . . . . . . . .  22
        3.4.1.  Physical Broadcast Domain . . . . . . . . . . . . . .  22
        3.4.2.  Link-layer Broadcast Emulations . . . . . . . . . . .  23
-       3.4.3.  Mapping the IPv6 link Abstraction . . . . . . . . . .  25
+       3.4.3.  Mapping the IP Link Abstraction . . . . . . . . . . .  25
        3.4.4.  Mapping the IPv6 Subnet Abstraction . . . . . . . . .  26
      3.5.  Stateful address Autoconfiguration and Subnet Routing . .  27
    4.  A Framework for Stateful address Autoconfiguration and Subnet
-           Routing . . . . . . . . . . . . . . . . . . . . . . . . .  27
+           Routing . . . . . . . . . . . . . . . . . . . . . . . . .  28
      4.1.  Implementing Stateful address Autoconfiguration . . . . .  28
      4.2.  links and link-local Addresses  . . . . . . . . . . . . .  29
      4.3.  Subnets and Global Addresses  . . . . . . . . . . . . . .  29
@@ -198,9 +198,9 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    match for a broadcast operation.
 
    The NS message for AR and DAD are sent at the network layer to a
-   Solicited-Node Multicast address (SNMA) [RFC4291] and should in
+   Solicited-Node multicast address (SNMA) [RFC4291] and should in
    theory only reach a very small group of nodes.  But to support SNMA,
-   the host must also support Multicast Listener Discovery (MLD)
+   the host must also support multicast Listener Discovery (MLD)
    [RFC3810], which may be an additional burden to a constrained stack,
    and the switches should support their own multicast routing and
    state, which is pushing the real problems to the lower layers.
@@ -228,7 +228,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
    This is why, in practice, ND-Classic messages to a SNMA are mapped to
    link-layer broadcast on Ethernet and Wireless networks, and to full
-   ingress replication in overlays.  Multicast NS transmissions may
+   ingress replication in overlays.  multicast NS transmissions may
    occur when a node joins the network, moves, or wakes up and
    reconnects to the network.  Over a very large fabric, this can
    generate hundreds of broadcasts per second.
@@ -405,7 +405,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
    A network-layer overlay is typically a partial or full mesh of point
    to point tunnels between routers.  In case of a full mesh, BUM
-   (Broadcast, Unknown, and Multicast) forwarding across the overlay can
+   (Broadcast, Unknown, and multicast) forwarding across the overlay can
    be implemented as a replication at the ingress router or at a
    dedicated reflector, but either way entails a growing congestion and
    latency as the overlay grows in size.  BUM forwarding has become so
@@ -709,9 +709,10 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    decoupled from their classical physical counterparts of port, link,
    and broadcast domains.  The Subnet is defined by a prefix length
    called Subnet Prefix Length (SPL), as the longest aggregation that
-   can be advertised in the IGP.  Host routes and prefixes longer than
-   SPL are advertised inside the Subnet only, using a separate Subnet
-   Gateway protocol.
+   can be advertised in the IGP.  An SPL of 64 is typical though the
+   architecture does not mandate it.  Host routes and prefixes longer
+   than SPL are advertised inside the Subnet only, using a separate
+   Subnet Gateway protocol (SGP).
 
    Any device that owns an address within the Subnet prefix belongs to
    the Subnet, this is now decoupled from the physical connectivity and
@@ -721,7 +722,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    another directly (classical NBMA, aka full mesh) or indirectly via
    other routers (Point to MultiPoint, P2MP, aka partial mesh).  The
    not-onlink model is used throughout, so hosts do not look each other
-   up, saving all the associated broadcast.  Instead, they rely on the
 
 
 
@@ -730,6 +730,7 @@ Thubert & Richardson    Expires 9 September 2023               [Page 13]
 Internet-Draft               IPv6 over NBMA                   March 2023
 
 
+   up, saving all the associated broadcast.  Instead, they rely on the
    routers to forward the packets inside and outside the Subnet.  This
    way, the Subnet can have any structure needed for the deployment,
    where hosts can move from router to router in the Subnet, or anywhere
@@ -763,21 +764,20 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    duplications.  The registration is abstract to the routing service
    and the registrar service, and it can be protected to prevent
    impersonation attacks.  The registration enables the network to know
-   deterministically all the IPv6 addresses and LLA mapping currently in
-   use, and eliminates the need for lookups and DAD, and for the
-   associated broadcasts.
+   deterministically all the IPv6 addresses and link-layer address
+   mapping currently in use, and eliminates the need for lookups and
+   DAD, and for the associated broadcasts.
 
-
-
-
-
-
-
-
-
-
-
-
+   The abstract routing service allows an ingress router to find a path
+   to the destination address within the Subnet.  It can be a simple
+   reflection in a Hub-and-Spoke Subnet that emulates an IEEE Std.
+   802.11 Infrastructure BSS at the network layer.  It can also be a
+   full-fledge routing protocol, e.g., RPL (see [RFC9010]), which is
+   designed to adapt to various LLNs such as WLAN and WPAN radio meshes,
+   or RIFT (see [I-D.ietf-rift-rift]) or BGP/EVPN (see [RFC8365]), for
+   application in data centers.  It can be based on overlay tunnels
+   between ingress router and egress router leveraging a resolver
+   service such as LISP, see [RFC7834] for more.  Finally, the routing
 
 
 
@@ -786,18 +786,9 @@ Thubert & Richardson    Expires 9 September 2023               [Page 14]
 Internet-Draft               IPv6 over NBMA                   March 2023
 
 
-   The abstract routing service allows an ingress router to find a path
-   to the destination address within the Subnet.  It can be a simple
-   reflection in a Hub-and-Spoke Subnet that emulates an IEEE Std.
-   802.11 Infrastructure BSS at the network layer.  It can also be a
-   full-fledge routing protocol, e.g., RPL, which is designed to adapt
-   to various LLNs such as WLAN and WPAN radio meshes, see [RFC9010] for
-   more, or BGP/EVPN, for application in data centers, see [RFC8365] for
-   more.  It can be based on overlay tunnels between ingress router and
-   egress router leveraging a resolver service such as LISP, see
-   [RFC7834] for more.  Finally, the routing service can also be an ND
-   proxy that emulates an IEEE Std. 802.11 Infrastructure ESS at the
-   network layer, as specified in the IPv6 Backbone Router [RFC8929].
+   service can also be an ND proxy that emulates an IEEE Std. 802.11
+   Infrastructure ESS at the network layer, as specified in the IPv6
+   Backbone Router [RFC8929].
 
    The abstract registrar service maintains the mapping between the
    registered node link-layer address and the registered IPv6 address.
@@ -834,14 +825,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    legacy ND-Classic network through ND proxy, as well as EVPN-based and
    LISP-based overlays.
 
-
-
-
-Thubert & Richardson    Expires 9 September 2023               [Page 15]
-
-Internet-Draft               IPv6 over NBMA                   March 2023
-
-
 3.2.  Acronyms
 
    This document uses the following abbreviations:
@@ -851,6 +834,14 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    6LR:  6LoWPAN Router
    ARO:  address Registration Option
    BGP:  Border Gateway Protocol
+
+
+
+Thubert & Richardson    Expires 9 September 2023               [Page 15]
+
+Internet-Draft               IPv6 over NBMA                   March 2023
+
+
    DAC:  Duplicate address Confirmation (message)
    DAD:  Duplicate address Detection
    DAR:  Duplicate address Request (message)
@@ -861,11 +852,11 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    LAN:  Local Area Network
    LISP:  Locator/ID Separation Protocol
    LLN:  Low-Power and Lossy Network
-   LLA:  link-local Address
+   LLA:  link-local address
    LoWPAN:  Low-Power WPAN
    MAC:  Medium Access Control
    MLSN:  Multi-link Subnet
-   MLD:  Multicast Listener Discovery
+   MLD:  multicast Listener Discovery
    NA:  Neighbor Advertisement (message)
    NBMA:  Non-Broadcast Multi-Access
    NCE:  Neighbor Cache Entry
@@ -890,14 +881,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 3.3.  Terminology
 
-
-
-
-Thubert & Richardson    Expires 9 September 2023               [Page 16]
-
-Internet-Draft               IPv6 over NBMA                   March 2023
-
-
 3.3.1.  IP Links
 
    The term "link" refers to layer 2 (comprising MAC and link layers)
@@ -907,6 +890,13 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    differentiate it from an IP Link, which is a network-layer
    abstraction that represents the link but is not the link, like the
    map is not the country.
+
+
+
+Thubert & Richardson    Expires 9 September 2023               [Page 16]
+
+Internet-Draft               IPv6 over NBMA                   March 2023
+
 
    With IPv6, IP has moved to network-layer abstractions for its
    operations, e.g., with the use of a link-local address (LLA), and
@@ -941,18 +931,11 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    over a given lower-layer subnetwork, e.g., to map a Frame Relay
    network as a P2MP IP Link, or as a collection of P2P IP Links.  As
    another example, an Ethernet fabric may be bridged, in which case the
-   nodes that interconnect the link-layer links are L2 switches, and the
-   fabric can be abstracted as a single transit IP Link; or the fabric
-   can be routed, in which case the P2P IP Links are congruent with the
-   link-layer links, and the nodes that interconnect the links are
-   routers.
-
-
-
-Thubert & Richardson    Expires 9 September 2023               [Page 17]
-
-Internet-Draft               IPv6 over NBMA                   March 2023
-
+   nodes that interconnect the lower-layer links are L2 switches, and
+   the fabric can be abstracted as a single transit IP Link; or the
+   fabric can be routed, in which case the P2P IP Links are congruent
+   with the link-layer links, and the nodes that interconnect the links
+   are routers.
 
    This architecture only uses P2P Link abstractions as shown in
    Figure 1, where an IP Link is identified by a pair of local and
@@ -961,6 +944,15 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    architecture maps each peer relationship as a different IP Link.  A
    link-local address only needs to be unique within that peer to peer
    relationship.
+
+
+
+
+
+Thubert & Richardson    Expires 9 September 2023               [Page 17]
+
+Internet-Draft               IPv6 over NBMA                   March 2023
+
 
    +--------------------
    |
@@ -1002,6 +994,14 @@ Internet-Draft               IPv6 over NBMA                   March 2023
       communication) and bundles the interfaces for each IP Subnet as
       subInterfaces.  The host installs at least one link-local address
       on an IP Interface for each IP Link that is connected through that
+      Interface, and one subInterface per Subnet.  The same link-local
+      address may be reused over different IP Links as long as it is not
+      a collision for the peer on that IP Link.  Similarly, the host
+      installs one or more global scope unicast address(es) on an IP
+      subInterface for the associated Subnet, and the address is
+      advertised over each IP Link in the SubInterface.
+
+
 
 
 
@@ -1009,13 +1009,6 @@ Thubert & Richardson    Expires 9 September 2023               [Page 18]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
-
-      Interface, and one subInterface per Subnet.  The same link-local
-      address may be reused over different IP Links as long as it is not
-      a collision for the peer on that IP Link.  Similarly, the host
-      installs one or more global scope unicast address(es) on an IP
-      subInterface for the associated Subnet, and the address is
-      advertised over each IP Link in the SubInterface.
 
    *  an IP Interface can be P2P, in which case it connects to a single
       IP Link, or P2MP, in which case it aggregates multiple IP Links.
@@ -1052,10 +1045,17 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    IPv6 builds another abstraction, the IP Subnet, over one shared IP
    Link or over a collection IP Links, forming a MLSN in the latter
    case.  An MLSN is formed over IP Links (e.g., P2P or P2MP) that are
-   interconnected by routers that either inject hosts routes in an IGP,
+   interconnected by routers that either inject hosts routes in an SGP,
    in which case the topology can be anything, or perform ND proxy
    operations, in which case the structure of links must be strictly
    hierarchical to avoid loops.
+
+
+
+
+
+
+
 
 
 
@@ -1092,7 +1092,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
                         Figure 3: Subnet Abstraction
 
    It is a network design decision to use one IP Subnet model or another
-   over a given lower layer network.  A switched fabric can host one or
+   over a given lower-layer network.  A switched fabric can host one or
    more IP subnets, in which case the IP Links can reach all and beyond
    one Subnet.  On the other hand, a Subnet can encompass a collection
    of links; in that case, the scope of the link-local addresses, which
@@ -1107,9 +1107,9 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    The switched and routed fabric above could be the exact same network
    of physical links and boxes, what changes is the way the networking
    abstractions are mapped onto the system, and the implication of such
-   decision include the capability to reach another node at link-layer,
-   and the size of the broadcast domain and related broadcast storms.
-
+   decision include the capability to reach another node at the link
+   layer, and the size of the broadcast domain and related broadcast
+   storms.
 
 
 
@@ -1129,7 +1129,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    interconnect IP Links and enable to isolate the link-layer broadcast
    domains.  But in the case of a bridging proxy, the link-layer unicast
    communication can still exist between the link-layer domains that are
-   covered by the network-layer links, whereas in the base of a routing
+   covered by network-layer links, whereas in the base of a routing
    proxy, they are isolated, and packets must be routed back and forth.
    Bridging proxies are possible between compatible technologies and
    translational bridges (e.g., Wi-Fi to Ethernet), whereas routing
@@ -1206,7 +1206,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
    At the physical (PHY) layer, a node's broadcast domain is the set of
    nodes that may receive a transmission that the node sends over a
-   network port, in other words the set of nodes in range of the radio
+   network port, for instance the set of nodes in range of the radio
    transmission.  This set can comprise a single peer on a serial cable
    used as point-to-point link.  It may also comprise multiple peer
    nodes on a broadcast radio or a shared physical resource such as the
@@ -1219,13 +1219,13 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    given frame are statistical.  In average and in stable conditions,
    the broadcast domain of a particular node can be still be seen as
    mostly constant and can be used to define a closure of nodes on which
-   an upper layer abstraction can be built.
+   an upper-layer abstraction can be built.
 
    A physical-layer communication can be established between two nodes
    if the physical broadcast domains of their unicast transmissions
-   overlap.  On WLAN and LoWPAN radios, that relation is usually not
-   reflexive, since nodes disable the reception when they transmit;
-   still they may retain a copy of the transmitted frame, so it can be
+   include one another.  On WLAN and LoWPAN radios, that relation is
+   usually not reflexive, since nodes disable the reception when they
+   transmit; still they may retain a copy of the transmitted frame, so
 
 
 
@@ -1234,20 +1234,20 @@ Thubert & Richardson    Expires 9 September 2023               [Page 22]
 Internet-Draft               IPv6 over NBMA                   March 2023
 
 
-   seen as reflexive at the MAC layer.  It is often symmetric, meaning
-   that if B can receive a frame from A, then A can receive a frame from
-   B.  But there can be asymmetries due to power levels, interferers
-   near one of the receivers, or differences in the quality of the
-   hardware (e.g., crystals, PAs and antennas) that may affect the
-   balance to the point that the connectivity becomes mostly uni-
+   it can be seen as reflexive at the MAC layer.  It is often symmetric,
+   meaning that if B can receive a frame from A, then A can receive a
+   frame from B.  But there can be asymmetries due to power levels,
+   interferers near one of the receivers, or differences in the quality
+   of the hardware (e.g., crystals, PAs and antennas) that may affect
+   the balance to the point that the connectivity becomes mostly uni-
    directional, e.g., A to B but practically not B to A.
 
    It takes a particular effort to place a set of devices in a fashion
    that all their physical broadcast domains fully overlap, and that
    specific situation can not be assumed in the general case.  In other
    words, the relation of radio connectivity is generally not
-   transitive, meaning that A in range with B and B in range with C does
-   not necessarily imply that A is in range with C.
+   transitive, meaning that A in range of B and B in range of C does not
+   necessarily imply that A is in range of C.
 
 3.4.2.  Link-layer Broadcast Emulations
 
@@ -1350,30 +1350,30 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    (e.g., a IEEE Std. 802.11s or IEEE Std. 802.15.10) provides meshing
    services that are similar to bridging, and the broadcast domain is
    well-defined by the membership of the mesh.  Mesh-Under emulates a
-   broadcast domain by flooding the broadcast packets at the link-layer.
+   broadcast domain by flooding the broadcast packets at the link layer.
    When operating on a single frequency, this operation is known to
    interfere with itself, and requires inter-frame gaps to dampen the
    collisions, which reduces further the amount of available bandwidth.
 
    As the cost of broadcast transmissions becomes increasingly
-   expensive, there is a push to rethink the upper layer protocols to
+   expensive, there is a push to rethink the upper-layer protocols to
    reduce the dependency on broadcast operations.
 
-3.4.3.  Mapping the IPv6 link Abstraction
+3.4.3.  Mapping the IP Link Abstraction
 
-   As introduced in Section 3.3.1, IPv6 defines a concept of link, link
-   scope and link-local Addresses (LLA), an LLA being unique and usable
-   only within the Scope of a Link.  The ND-Classic [RFC4861] DAD
-   [RFC4862] process uses a multicast transmission to detect a duplicate
-   address, which requires that the owner of the address is connected to
-   the link-layer broadcast domain of the sender.
+   As introduced in Section 3.3.1, IPv6 defines a concept of IP Link,
+   link scope and link-local Addresses (LLA), an LLA being unique and
+   usable only within the scope of an IP Link.  The ND-Classic [RFC4861]
+   DAD [RFC4862] process uses a multicast transmission to detect a
+   duplicate address, which requires that the owner of the address is
+   connected to the link-layer broadcast domain of the sender.
 
    On a wired medium, the IP Link is often confused with the physical
    broadcast domain because both are determined by the serial cable or
    the Ethernet shared wire.  Ethernet Bridging reinforces that illusion
    with a link-layer broadcast domain that emulates a physical broadcast
    domain over the mesh of wires.  But the difference shows on legacy
-   P2MP and NBMA networks such as ATM and Frame-Relay, on shared links
+   P2MP and NBMA networks such as ATM and Frame-Relay, on shared links,
    and on newer types of NBMA networks such as radio and composite
    radio-wires networks.  It also shows when private VLANs or link-layer
    cryptography restrict the capability to read a frame to a subset of
@@ -1381,7 +1381,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
    In Mesh-Under and Infrastructure BSS, the IP Link extends beyond the
    physical broadcast domain to the emulated link-layer broadcast
-   domain.  Relying on Multicast for the ND operation remains feasible
+   domain.  Relying on multicast for the ND operation remains feasible
    but becomes highly detrimental to the unicast traffic, and becomes
    less and less energy-efficient and reliable as the network grows.
 
@@ -1418,18 +1418,19 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 3.4.4.  Mapping the IPv6 Subnet Abstraction
 
    As introduced in Section 3.3.3, IPv6 also defines the concept of a IP
-   Subnet for Global and Unique Local Addresses (GLA and ULA).  All the
-   addresses in the same Subnet share the same prefix, and by extension,
-   a node belongs to an IP Subnet if it has an address that derives from
-   the prefix of the Subnet.  That address must be topologically
-   correct, meaning that it must be installed on a sub-Interface that
-   connects to the Subnet, for use with routers that expose the Subnet
-   in their RA messages (see [RFC5942]).
+   Subnet for IPv6 unicast addresses with a global scope, Global and
+   Unique Local Addresses (GUA and ULA).  All the addresses in the same
+   Subnet share the same prefix, and by extension, a node belongs to an
+   IP Subnet if it has an address that derives from the prefix of the
+   Subnet.  That address must be topologically correct, meaning that it
+   must be installed on a sub-Interface that connects to the Subnet, for
+   use with routers that expose the Subnet in their RA messages (see
+   [RFC5942]).
 
    Unless intently replicated in different locations for very specific
    purposes, a Subnet prefix is unique within a routing system; for
    ULAs, the routing system is typically a limited domain, whereas for
-   GLAs, it is the whole Internet.
+   GUAs, it is the whole Internet.
 
    For that reason, it is sufficient to validate that an address that is
    formed from a Subnet prefix is unique within the scope of that Subnet
@@ -1445,11 +1446,10 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    case of an MLSN, route the packet to the destination within the
    Subnet.
 
-   If the Subnet is known as on-link, then any node may also resolve the
-   destination link-layer address and deliver the packet, but if the
-   Subnet is not on-link, then a host in the Subnet that does not have a
-   Neighbor Cache Entry (NCE) for the destination will also need to pass
-   the packet to a router, more in [RFC5942].
+
+
+
+
 
 
 
@@ -1457,6 +1457,12 @@ Thubert & Richardson    Expires 9 September 2023               [Page 26]
 
 Internet-Draft               IPv6 over NBMA                   March 2023
 
+
+   If the Subnet is known as on-link, then any node may also resolve the
+   destination link-layer address and deliver the packet, but if the
+   Subnet is not on-link, then a host in the Subnet that does not have a
+   Neighbor Cache Entry (NCE) for the destination will also need to pass
+   the packet to a router, more in [RFC5942].
 
    On Ethernet, an IP Subnet is often congruent with an IP Link because
    both are determined by the physical attachment to a shared wire or an
@@ -1494,16 +1500,10 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    the L2 broadcast domain and rely on their routers to forward the
    packets inside and outside the Subnet.  In turn, the router expose to
    each other all the IPv6 addresses that are either owned or registered
-   to it as host routes over a Subnet Gateway Protocol, an IGP that is
-   specialized in routing inside the Subnet and can be decoupled with
-   the routing protocol used between subnets.
-
-4.  A Framework for Stateful address Autoconfiguration and Subnet
-    Routing
-
-
-
-
+   to it as host routes over a Subnet Gateway Protocol, a routing
+   protocol that is specialized in routing inside the Subnet and can be
+   decoupled with the IGP, that is the routing protocol used between
+   subnets.
 
 
 
@@ -1514,6 +1514,9 @@ Thubert & Richardson    Expires 9 September 2023               [Page 27]
 Internet-Draft               IPv6 over NBMA                   March 2023
 
 
+4.  A Framework for Stateful address Autoconfiguration and Subnet
+    Routing
+
 4.1.  Implementing Stateful address Autoconfiguration
 
    SFAAC was initially standardized for IoT and wireless links as
@@ -1522,15 +1525,15 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    Target address is being registered and provides the registration
    parameters [RFC8505].  This method allows to prepare and maintain the
    host routes in the routers and avoids the reactive address Resolution
-   in ND-Classic and the associated link-layer broadcasts transmissions.
+   in ND-Classic and the associated link-layer broadcast transmissions.
 
    The EARO provides information to the router that is independent to
-   the routing protocol and routing can take multiple forms, from a
-   traditional IGP to a collapsed Hub-and-Spoke model where only one
-   router owns and advertises the prefix.  [RFC8505] is already
-   referenced as the registration interface to "RIFT: Routing in Fat
-   Trees" [I-D.ietf-rift-rift] and "RPL: IPv6 Routing Protocol for
-   Low-Power and Lossy Networks" [RFC6550] with [RFC9010].
+   the routing protocol and routing can take multiple forms, from an SGP
+   to a collapsed Hub-and-Spoke model where only one router owns and
+   advertises the prefix.  [RFC8505] is already referenced as the
+   registration interface to "RIFT: Routing in Fat Trees"
+   [I-D.ietf-rift-rift] and "RPL: IPv6 Routing Protocol for Low-Power
+   and Lossy Networks" [RFC6550] with [RFC9010].
 
    Wireless ND (WiND) is an example instantiation of the Architecture
    presented in Section 3; it combines SFAAC with a Backbone Router
@@ -1559,9 +1562,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    of the registrar.  For instance, [EVPN-SFAAC] allows to distribute
    the registrar in every router, and leverages EVPN as the method to
    synchronize the registrar state between routers.  In that case, BGP
-   acts both as the SGP to announce the reachability of the addresses
-   and as the synchronization protocol between the distributed
-   registrar.  All the routers know proactively the mapping for all the
 
 
 
@@ -1570,6 +1570,9 @@ Thubert & Richardson    Expires 9 September 2023               [Page 28]
 Internet-Draft               IPv6 over NBMA                   March 2023
 
 
+   acts both as the SGP to announce the reachability of the addresses
+   and as the synchronization protocol between the distributed
+   registrar.  All the routers know proactively the mapping for all the
    addresses, and there is no need for a reactive lookup as is the case
    for WiND.  As another example, a Locator/ID Separation Protocol
    (LISP) Map-Resolver [RFC6830] could support the EDAR/EDAC exchange
@@ -1602,9 +1605,9 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    use case, but the one from ND is not, because the peripheral hosts
    are not on the same broadcast domain.
 
-   On the other hand, the uniqueness of Global and Unique-Local
-   Addresses is validated at the Subnet Level, using a logical registrar
-   that is global to the Subnet.
+   On the other hand, the uniqueness of GUAs and ULAs is validated at
+   the Subnet Level, using a logical registrar that is global to the
+   Subnet.
 
 4.3.  Subnets and Global Addresses
 
@@ -1614,9 +1617,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    In the Hub-and-Spoke case, each Hub-Spoke pair is a distinct IP Link,
    and a Subnet can be mapped on a collection of links that are
    connected to the Hub. The Subnet prefix is associated to the Hub.
-
-
-
 
 
 
@@ -1700,7 +1700,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    By definition, prefixes longer than SPL are inside a Subnet and do
    not leak outside the SGP.  Still, it is valid for a node to register
    a prefix of any size longer than SPL, and for the router to advertise
-   the registered prefix in the IGP.  This can be useful for instance to
+   the registered prefix in the SGP.  This can be useful for instance to
    expose a /96 Prefix that is used to transport IPv4 mapped traffic
    [RFC6052].
 
@@ -1716,15 +1716,15 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    WiND applies equally to physical links that are P2P, transit, P2MP
    Hub-and-Spoke, to links that provide link-layer Broadcast Domain
    Emulation such as Mesh-Under and Wi-Fi BSS, and to Route-Over meshes.
+   In either cases, the IP Link abstraction in WiND is always P2P.
 
    There is an intersection where The IP Link and the IP Subnet are
    congruent and where both ND and WiND could apply.  These includes
    P2P, the MAC emulation of a PHY broadcast domain, and the particular
    case of always on, fully overlapping physical radio broadcast domain.
    But even in those cases where both are possible, WiND is preferable
-   vs. ND because it reduces the need of broadcast.
-
-   This is discussed in more details in the introduction of [RFC8929].
+   vs. ND because it reduces the need of broadcast; for more details,
+   see the introduction of [RFC8929].
 
    There are also a number of practical use cases in the wireless world
    where links and subnets are not congruent:
@@ -1739,13 +1739,13 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
 
    *  The IEEE Std. 802.11 infrastructure BSS enables one Subnet per AP,
-      and emulates a broadcast domain at the link-layer.  The
+      and emulates a broadcast domain at the link layer.  The
       Infrastructure ESS extends that model over a backbone and
       recommends the use of an ND proxy [IEEE Std. 802.11] to
       interoperate with Ethernet-connected nodes.  WiND incorporates an
       ND proxy to serve that need, which was missing so far.
 
-   *  Bluetooth is Hub-and-Spoke at the link-layer.  It would make
+   *  Bluetooth is Hub-and-Spoke at the link layer.  It would make
       little sense to configure a different Subnet between the central
       and each individual peripheral node (e.g., sensor).  Rather,
       [RFC7668] allocates a prefix to the central node acting as router,
@@ -1774,7 +1774,8 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    LPWANs are by nature so constrained that the addresses and subnets
    are fully pre-configured and operate as P2P or Hub-and-Spoke.  This
    saves the steps of neighbor Discovery and enables a very efficient
-   stateful compression of the IPv6 header.
+   stateful compression of the IPv6 header.  So neither Classic-ND nor
+   WiND is really used in that space.
 
 5.2.  Case of Infrastructure BSS and ESS
 
@@ -1783,9 +1784,8 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    paid to privacy.  Addresses may be formed and deprecated
    asynchronously to the association.
 
-   Snooping protocols such as ND-Classic and DHCPv6 and observing data
-   traffic sourced at the STA provides an imperfect knowledge of the
-   state of the STA at the AP.  Missing a state or a transition may
+
+
 
 
 
@@ -1794,6 +1794,9 @@ Thubert & Richardson    Expires 9 September 2023               [Page 32]
 Internet-Draft               IPv6 over NBMA                   March 2023
 
 
+   Snooping protocols such as ND-Classic and DHCPv6 and observing data
+   traffic sourced at the STA provides an imperfect knowledge of the
+   state of the STA at the AP.  Missing a state or a transition may
    result in the loss of connectivity for some of the addresses, in
    particular for an address that is rarely used, belongs to a sleeping
    node, or one in a situation of mobility.  This may also result in
@@ -1820,11 +1823,11 @@ Internet-Draft               IPv6 over NBMA                   March 2023
       figure the order of events in a fast mobility scenario without
       loss of connectivity.
 
-   The ESS mode requires a proxy ND operation at the AP.  The proxy ND
-   operation must cover Duplicate address Detection, Neighbor
-   Unreachability Detection, address Resolution and address Mobility to
-   transfer a role of ND proxy to the AP where a STA is associated
-   following the mobility of the STA.
+   The ESS mode requires a "ARP-Proxy" operation at the AP.  This
+   includes a proxy ND operation that must cover Duplicate address
+   Detection, Neighbor Unreachability Detection, address Resolution and
+   address Mobility to transfer a role of ND proxy to the AP where a STA
+   is associated following the mobility of the STA.
 
    The WiND proxy ND specification that associated to the address
    Registration is [RFC8929].  With that specification, the AP
@@ -1839,9 +1842,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    routes to the STA at the network layer.  The routing proxy reduces
    the need to expose the MAC address of the STA on the wired side, for
    a better stability and scalability of the bridged fabric.
-
-
-
 
 
 
@@ -2307,7 +2307,7 @@ Internet-Draft               IPv6 over NBMA                   March 2023
 
    Note that the RS sent initially by the 6LN (e.g., a Wi-Fi STA) is
    transmitted as a multicast, but since it is intercepted by the 6BBR,
-   it is never effectively broadcast at link-layer.  The multiple arrows
+   it is never effectively broadcast at link layer.  The multiple arrows
    in Figure 7 associated to the ND messages on the backbone denote a
    real link-layer broadcast.
 
@@ -2471,8 +2471,9 @@ Internet-Draft               IPv6 over NBMA                   March 2023
    architecture, and to Erik Nordmark and Zach Shelby with whom this
    work really started during IETF 72 in Dublin.
 
-   Also many thanks to Eduard Vasilenko, XiPeng Xiao, for their
-   contributions and support to this work at 6MAN, v6Ops, and ETSI IPE.
+   Also many thanks to Eduard Vasilenko, XiPeng Xiao, Behcet Sarikaya
+   for their contributions and support to this work at 6MAN, v6Ops, and
+   ETSI IPE.
 
 12.  Normative References
 
@@ -2513,7 +2514,6 @@ Internet-Draft               IPv6 over NBMA                   March 2023
               Uttaro, J., Drake, J., and W. Henderickx, "BGP MPLS-Based
               Ethernet VPN", RFC 7432, DOI 10.17487/RFC7432, February
               2015, <https://www.rfc-editor.org/info/rfc7432>.
-
 
 
 
