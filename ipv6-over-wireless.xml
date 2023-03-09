@@ -912,7 +912,7 @@ The registration carries a sequence number, which enables to figure the order of
 </li>
 </ul>
 <t>
-The ESS mode requires a "ARP-Proxy" operation at the AP. This includes a proxy ND operation that must cover Duplicate address Detection, Neighbor Unreachability Detection, address Resolution and address Mobility to transfer a role of ND proxy to the AP where a STA is associated following the mobility of the STA.
+The ESS mode requires a "ARP-Proxy" operation at the AP. This includes a proxy ND operation that must cover Duplicate Address Detection, Neighbor Unreachability Detection, Address Resolution and Address Mobility to transfer a role of ND proxy to the AP where a STA is associated following the mobility of the STA. New text in the 802.11me revision (WIP) encourages to turn link-layer broadcast into unicast and let the STA respond for itself, as opposed to responding on behalf, unless operating as a sleep proxy.
 </t>
 <t>
 The WiND proxy ND specification that associated to the address Registration is <xref target="RFC8929"/>. With that specification, the AP participates to the protocol as a Backbone Router, typically operating as a bridging proxy though the routing proxy operation is also possible.
