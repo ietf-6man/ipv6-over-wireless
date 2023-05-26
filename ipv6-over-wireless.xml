@@ -23,10 +23,10 @@ updates="" consensus="true" submissionType="IETF" xml:lang="en" version="3" docN
       <organization abbrev='Cisco Systems'>Cisco Systems, Inc</organization>
       <address>
          <postal>
-            <street>Building D</street>
-            <street>45 Allee des Ormes - BP1200 </street>
-            <city>Mougins - Sophia Antipolis</city>
-            <code>06254</code>
+            <street>Emerald Square, Batiment C</street>
+            <street>rue Evariste Galois </street>
+            <city>BIOT - Sophia Antipolis</city>
+            <code>06410</code>
           <country>France</country>
          </postal>
          <phone>+33 497 23 26 34</phone>
@@ -113,6 +113,55 @@ updates="" consensus="true" submissionType="IETF" xml:lang="en" version="3" docN
 
    </section><!--Introduction-->
 
+<section anchor='acronyms' > <name>Acronyms</name>
+    <t> This document uses the following abbreviations:
+    </t>
+       <dl spacing='compact'>
+       <dt>6BBR:</dt><dd>6LoWPAN Backbone Router </dd>
+       <dt>6LN:</dt><dd>6LoWPAN Node  </dd>
+       <dt>6LR:</dt><dd>6LoWPAN Router </dd>
+       <dt>ARO:</dt><dd>address Registration Option</dd>
+       <dt>BGP:</dt><dd> Border Gateway Protocol  </dd>
+       <dt>DAC:</dt><dd>Duplicate address Confirmation (message)</dd>
+       <dt>DAD:</dt><dd>Duplicate address Detection </dd>
+       <dt>DAR:</dt><dd>Duplicate address Request (message)</dd>
+       <dt>DOS:</dt><dd>Denial of Service (attack)</dd>
+       <dt>EDAC:</dt><dd>Extended Duplicate address Confirmation  </dd>
+       <dt>EDAR:</dt><dd>Extended Duplicate address Request</dd>
+       <dt>EVPN:</dt><dd>Ethernet VPN</dd>
+       <dt>IGP:</dt><dd> Interior Gateway Protocol  </dd>
+       <dt>LAN:</dt><dd>Local Area Network </dd>
+       <dt>LISP:</dt><dd>Locator/ID Separation Protocol</dd>
+       <dt>LLN:</dt><dd>Low-Power and Lossy Network </dd>
+       <dt>LLA:</dt><dd>link-local address </dd>
+       <dt>LoWPAN:</dt><dd>Low-Power WPAN </dd>
+       <dt>MAC:</dt><dd>Medium Access Control</dd>
+       <dt>MLSN:</dt><dd>Multi-link Subnet </dd>
+       <dt>MLD:</dt><dd> multicast Listener Discovery </dd>
+       <dt>NA:</dt><dd> Neighbor Advertisement (message)</dd>
+       <dt>NBMA:</dt><dd> Non-Broadcast Multi-Access </dd>
+       <dt>NCE:</dt><dd> Neighbor Cache Entry  </dd>
+       <dt>ND:</dt><dd> Neighbor Discovery (protocol)</dd>
+       <dt>NDP:</dt><dd> Neighbor Discovery Protocol </dd>
+       <dt>NS:</dt><dd> Neighbor Solicitation (message) </dd>
+       <dt>P2P:</dt><dd> Point-to-Point </dd>
+       <dt>P2MP:</dt><dd> Point-to-Multipoint </dd>
+       <dt>RPL:</dt><dd>IPv6 Routing Protocol for LLNs </dd>
+       <dt>RA:</dt><dd> Router Advertisement (message) </dd>
+       <dt>RS:</dt><dd> Router Solicitation (message) </dd>
+       <dt>SGP:</dt><dd> Subnet Gateway Protocol  </dd>
+       <dt>SPL:</dt><dd> Subnet Prefix Length  </dd>
+       <dt>ULP:</dt><dd> Upper-Layer Protocol  </dd>
+       <dt>VLAN:</dt><dd>Virtual LAN </dd>
+       <dt>VxLAN:</dt><dd>Virtual Extensible LAN</dd>
+       <dt>VPN:</dt><dd>Virtual Private Network</dd>
+       <dt>WAN:</dt><dd>Wide Area Network </dd>
+       <dt>WiND:</dt><dd>Wireless Neighbor Discovery (protocol)</dd>
+       <dt>WLAN:</dt><dd>Wireless Local Area Network </dd>
+       <dt>WPAN:</dt><dd>Wireless Personal Area Network </dd>
+       </dl>
+
+     </section><!-- Acronyms -->
    <section anchor="NDIssues"> <name>Issues with ND-Classic-Based Access</name>
 
      <section anchor='nd' > <name>ND-Classic and ND-Proxies</name>
@@ -210,7 +259,7 @@ updates="" consensus="true" submissionType="IETF" xml:lang="en" version="3" docN
     As opposed to unicast transmissions, the broadcast transmissions over wireless links are not subject to automatic retries (ARQ) and therefore are not reliable.
     Reducing the speed at the physical (PHY) layer for broadcast transmissions can increase the reliability, at the expense of a higher relative cost of broadcast on the overall available bandwidth.
     </t>
-    <t>Excessive use of broadcast by protocols such as ND-Classic and Bonjour led network administrators to install multicast rate limiting to protect the network. Experimentally, this proved to have a dramatic effect on ND performance in large wireless networks. From some testing done at an IETF meeting a few years ago, it seemed that up to 90% of IPv6 link-local multicasts were dropped. The impact on user experience is usually limited since for the most part, the users will connect to addresses outside the Subnet and will not attempt to locate one another. The impact on the NOC might still be significant, since a failure related to ND operations might be transient and difficult to debunk after the fact.
+    <t>Excessive use of broadcast by protocols such as ND-Classic and Bonjour/mDNS (see <xref target="RFC6762"/>) led network administrators to install multicast rate limiting to protect the network. Experimentally, this proved to have a dramatic effect on ND performance in large wireless networks. From some testing done at an IETF meeting a few years ago, it seemed that up to 90% of IPv6 link-local multicasts were dropped. The impact on user experience is usually limited since for the most part, the users will connect to addresses outside the Subnet and will not attempt to locate one another. The impact on the NOC might still be significant, since a failure related to ND operations might be transient and difficult to debunk after the fact.
     </t>
     <t>
     Another experiment conducted during an IETF meeting consisted in manually forcing address duplicates to observe the DAD behavior.
@@ -221,7 +270,7 @@ updates="" consensus="true" submissionType="IETF" xml:lang="en" version="3" docN
     On paper, a Wi-Fi station must keep its radio turned on to listen to the periodic series of broadcast frames.  Most of those broadcasts are dropped at the network layer when the receiving node finds it is not interested, as is the case of NS messages when the node is not the Target. In order to protect the battery lifetime, a typical smartphone will listen at a multiple of the broadcast period, blindly ignoring a large ratio of the broadcasts, and making ND-Classic operations even less reliable.
     </t>
     <t>
-    Net-net: broadcast transmissions are not reliable on wireless. Protocols designed for bridged networks that rely on broadcast transmissions often exhibit disappointing behaviors when employed unmodified on a local wireless medium (more in <xref target="I-D.ietf-mboned-ieee802-mcast-problems"/>). Even though there is at most one intended Target for a broadcast AR or DAD message, the broadcast impacts many wireless nodes over the whole Subnet (e.g., the ESS fabric), and yet the chances that intended Target receives the packet are limited.
+    Net-net: broadcast transmissions are not reliable on wireless. Protocols designed for bridged networks that rely on broadcast transmissions often exhibit disappointing behaviors when employed unmodified on a local wireless medium (more in <xref target="RFC9119"/> ). Even though there is at most one intended Target for a broadcast AR or DAD message, the broadcast impacts many wireless nodes over the whole Subnet (e.g., the ESS fabric), and yet the chances that intended Target receives the packet are limited.
     The fact that the user experience for classic-ND is not so dramatically affected only shows that those broadcasts are, for a large part, a useless waste of expensive resources.
     </t>
     <t>
@@ -300,7 +349,7 @@ updates="" consensus="true" submissionType="IETF" xml:lang="en" version="3" docN
    Because ND-Classic is so easy to attack, some vendors have deployed undocumented proprietary counter measures as middlebox operation in the switches and routers. Those middleboxes snoop the ND-Classic messages, filter them or modify them, for instance to change their link-layer scope from broadcast to unicast. Based on the snooped information, the middlebox may for instance drop an RA message that appears to be coming from a host (e.g., as inferred because it is received on a wireless adapter), or an NA message coming from a device that does not appear to be the owner. But, for the lack of an explicit contract between the host and the middlebox, the middlebox cannot determine who the real owner is, and it may deny a rightful user.
    </t>
    <t>
-   In a managed network, IP addresses are an expensive and thus a limited resource. To ensure a fair use and protect against DOS attacks, the middlebox may also block Stateless address Autoconfiguration (SLAAC) from a host above a fixed number of addresses. When that happens, the host believes that it can use the address but fails to connect with it. This might happen even if the host has ceased to use other addresses and is now within the allowed quota. Classic-ND lacks both a method for the host to know how many addresses it can own, and a method for the router to know which addresses the host uses at any point of time. The infrastructure needs a deterministic knowledge of the addresses in use, and for that a contract must be passed between the host and the network to ensure that the all the addresses are known and usable.
+   In a managed network, IP addresses are an expensive and thus a limited resource. To ensure a fair use and protect against DOS attacks, the middlebox may also block Stateless address Autoconfiguration (SLAAC) from a host above a fixed number of addresses. When that happens, the host believes that it can use the address but fails to connect with it. This might happen even if the host has ceased to use other addresses and is now within the allowed quota. Classic-ND lacks both a method for the host to know how many addresses it can own, and a method for the router to know which addresses the host uses at any point of time. The infrastructure needs a deterministic knowledge of the addresses in use, and for that a contract must be passed between the host and the network to ensure that all the addresses are known and usable.
    </t>
    <t>
    Maybe the most insidious side effect of those middleboxes is that as opposed to NAT, their operation is obfuscated and proprietary. From one vendor to the next, and from one product generation to the next, their behavior may evolve and affect ND-Classic in different fashions. In the short term, this may only impact some specific deployments, which may have to work around the issues. In the longer term, this may affect the capability we have to evolve the protocol, like firewalls impact our capability to develop new transports in parallel to TCP and UDP. We must either standardize (e.g., for ND proxy) or eliminate those middlebox activities, and for that, the IPv6 ND protocol must evolve to a model where proprietary middleboxes are not needed anymore. This demands a model that minimizes the use of broadcasts, and where a contract provides mutual guarantees for the host that need IPv6 addresses and the routers that provide reachability and protection for these addresses.
@@ -343,7 +392,7 @@ updates="" consensus="true" submissionType="IETF" xml:lang="en" version="3" docN
     To that effect, this architecture leverages the not-onlink model and routing inside the Subnet, which enables to form potentially large MLSNs without creating a large broadcast domain at the link layer.
     </t>
     <t>
-    To support the deployment agility that virtual (e.g., VxLAN overlays and pseudowires) and intangible (e.g., wireless, laser, and quantum) links enable, the IP abstractions of Interface, Link, and Subnet are decoupled from their classical physical counterparts of port, link, and broadcast domains. The Subnet is defined by a prefix length called Subnet Prefix Length (SPL), as the longest aggregation that can be advertised in the IGP. An SPL of 64 is typical though the architecture does not mandate it. Host routes and prefixes longer than SPL are advertised inside the Subnet only, using a separate Subnet Gateway protocol (SGP).
+    To support the deployment agility that virtual (e.g., VxLAN overlays and pseudowires) and intangible (e.g., wireless, laser, and quantum) links enable, the IP abstractions of Interface, Link, and Subnet are decoupled from their classical physical counterparts of port, link, and broadcast domains. The Subnet is defined by a prefix length called Subnet Prefix Length (SPL), as the longest aggregation that can be advertised in the IGP. An SPL of 64 is typical though the architecture does not mandate it. Host routes and prefixes longer than SPL are advertised inside the Subnet only, using a separate Subnet Gateway protocol (SGP). The SGP is only required in the case of P2MP networks where routers need to relay packets inside the subnet.
     </t>
     <t>
     Any device that owns an address within the Subnet prefix belongs to the Subnet, this is now decoupled from the physical connectivity and broadcast domain. Instead, the IPv6 routers that serve a Subnet must form a connected dominating set such that every host in the Subnet is connected to at least one router and the routers are connected to one another directly (classical NBMA, aka full mesh) or indirectly via other routers (Point to MultiPoint, P2MP, aka partial mesh). The not-onlink model is used throughout, so hosts do not look each other up, saving all the associated broadcast. Instead, they rely on the routers to forward the packets inside and outside the Subnet. This way, the Subnet can have any structure needed for the deployment, where hosts can move from router to router in the Subnet, or anywhere in the Internet provided they can lay a mobility tunnel to one of the routers for use as IP Link to the Subnet.
@@ -372,54 +421,6 @@ updates="" consensus="true" submissionType="IETF" xml:lang="en" version="3" docN
 
 </section><!-- "Basic Concepts" -->
 
-<section anchor='acronyms' > <name>Acronyms</name>
-    <t> This document uses the following abbreviations:
-    </t>
-       <dl spacing='compact'>
-       <dt>6BBR:</dt><dd>6LoWPAN Backbone Router </dd>
-       <dt>6LN:</dt><dd>6LoWPAN Node  </dd>
-       <dt>6LR:</dt><dd>6LoWPAN Router </dd>
-       <dt>ARO:</dt><dd>address Registration Option</dd>
-       <dt>BGP:</dt><dd> Border Gateway Protocol  </dd>
-       <dt>DAC:</dt><dd>Duplicate address Confirmation (message)</dd>
-       <dt>DAD:</dt><dd>Duplicate address Detection </dd>
-       <dt>DAR:</dt><dd>Duplicate address Request (message)</dd>
-       <dt>EDAC:</dt><dd>Extended Duplicate address Confirmation  </dd>
-       <dt>EDAR:</dt><dd>Extended Duplicate address Request</dd>
-       <dt>EVPN:</dt><dd>Ethernet VPN</dd>
-       <dt>IGP:</dt><dd> Interior Gateway Protocol  </dd>
-       <dt>LAN:</dt><dd>Local Area Network </dd>
-       <dt>LISP:</dt><dd>Locator/ID Separation Protocol</dd>
-       <dt>LLN:</dt><dd>Low-Power and Lossy Network </dd>
-       <dt>LLA:</dt><dd>link-local address </dd>
-       <dt>LoWPAN:</dt><dd>Low-Power WPAN </dd>
-       <dt>MAC:</dt><dd>Medium Access Control</dd>
-       <dt>MLSN:</dt><dd>Multi-link Subnet </dd>
-       <dt>MLD:</dt><dd> multicast Listener Discovery </dd>
-       <dt>NA:</dt><dd> Neighbor Advertisement (message)</dd>
-       <dt>NBMA:</dt><dd> Non-Broadcast Multi-Access </dd>
-       <dt>NCE:</dt><dd> Neighbor Cache Entry  </dd>
-       <dt>ND:</dt><dd> Neighbor Discovery (protocol)</dd>
-       <dt>NDP:</dt><dd> Neighbor Discovery Protocol </dd>
-       <dt>NS:</dt><dd> Neighbor Solicitation (message) </dd>
-       <dt>P2P:</dt><dd> Point-to-Point </dd>
-       <dt>P2MP:</dt><dd> Point-to-Multipoint </dd>
-       <dt>RPL:</dt><dd>IPv6 Routing Protocol for LLNs </dd>
-       <dt>RA:</dt><dd> Router Advertisement (message) </dd>
-       <dt>RS:</dt><dd> Router Solicitation (message) </dd>
-       <dt>SGP:</dt><dd> Subnet Gateway Protocol  </dd>
-       <dt>SPL:</dt><dd> Subnet Prefix Length  </dd>
-       <dt>ULP:</dt><dd> Upper-Layer Protocol  </dd>
-       <dt>VLAN:</dt><dd>Virtual LAN </dd>
-       <dt>VxLAN:</dt><dd>Virtual Extensible LAN</dd>
-       <dt>VPN:</dt><dd>Virtual Private Network</dd>
-       <dt>WAN:</dt><dd>Wide Area Network </dd>
-       <dt>WiND:</dt><dd>Wireless Neighbor Discovery (protocol)</dd>
-       <dt>WLAN:</dt><dd>Wireless Local Area Network </dd>
-       <dt>WPAN:</dt><dd>Wireless Personal Area Network </dd>
-       </dl>
-
-     </section><!-- Acronyms -->
      <section anchor='terms' > <name>Terminology</name>
 
    <section anchor='linkdef' > <name>IP Links </name>
@@ -467,13 +468,17 @@ A link-local address only needs to be unique within that peer to peer relationsh
 
 +--------------------
 |
-|   IP Link 1 ---------------------------> Node 1
-       link-layer address MAC1             link-layer address MAC3
-|      link-local address LLA1             link-local address LLAN1
+|                                        +--
+|   IP Link 1 -------------------------> | Node 1
+|       link-layer address MAC1          |   link-layer address MAC3
+|       link-local address LLA1          |   link-local address LLAN1
+|                                        +--
 |
-|   IP Link 2 ---------------------------> Node 2
-       link-layer address MAC2             link-layer address MAC4
-|      link-local address LLA2             link-local address LLAN2
+|                                        +--
+|   IP Link 2 -------------------------> | Node 2
+|      link-layer address MAC2           |   link-layer address MAC4
+|      link-local address LLA2           |   link-local address LLAN2
+|                                        +--
 |                ...
 |
 |             (LLA 1 may be the same as LLA 2)
@@ -507,23 +512,27 @@ If only the network port but not the link-layer address of the peer is visible f
 
 <figure anchor='figInt'><name>Interface Abstraction</name>
  <artwork><![CDATA[
-+--------------------
-|
-|   IP SubInterface a  ------------------> IP Link A
-|      IP Subnet a::/64                    IP Link B
-|         IP Addresses a::1 .. a::n           ...
-|                                          IP Link N
-|
-|   IP SubInterface b  ------------------> IP Link A
-|      IP Subnet b::/64                    IP Link D
-|         IP Addresses b::1 .. b::n           ...
-|                                          IP Link P
-|                ...
-|
-|  (Link A and B may be attached to different network ports)
-|  (Link A may belong to both subInterfaces a and b)
-|
-+--------------------
+ +--------------------
+ |                                          +--
+ |   IP SubInterface a  ------------------> | IP Link A,
+ |      IP Subnet a::/64                    | IP Link B,
+ |         IP Addresses a::1 .. a::n        |   ...
+ |                                          | IP Link N.
+ |                                          +--
+ |
+ |                                          +--
+ |   IP SubInterface b  ------------------> | IP Link A,
+ |      IP Subnet b::/64                    | IP Link D,
+ |         IP Addresses b::1 .. b::n        |   ...
+ |                                          | IP Link P.
+ |                                          +--
+ |                ...
+ |
+ |  (Link A and B may be attached to different network ports)
+ |  (Link A may belong to both subInterfaces a and b)
+ |
+ +--------------------
+
       IP Interface, using SPL=64
 ]]></artwork>
 </figure>
@@ -830,14 +839,41 @@ The registration in <xref target="RFC8505"/> is abstract to the routing protocol
    </t>
    </section><!--Anycast and multicast Addresses -->
 
+   <section > <name>P2MP Networks</name>
+   <t>
+   In the case of P2MP networks, there is not necessarily a direct IP Link between a source and a destination that are in the same subnet. The expectation is that routers running a common SGP form a connected dominating set for the IP Subnet, meaning that every router can reach every other router directly or via some other routers, and that every host that has addresses in the IP Subnet is connected to at least one router that participates to the IGP.
+   </t>
 
-   <section > <name>Advertising Prefixes in the SGP</name>
+   <t>
+   The connected assumption allows any host to reach any other node in the subnet via one or more SGP routers, relying on the SGP alone for the forwarding decision inside the MLSN. Outreaching gateways for the subnet also inject a default route and more specific routes to external destinations.
+   </t>
+   <t>
+   In the resulting topology, IPv6 forms P2P IP Links between peer routers and hosts using <xref target="RFC8505"/>.
+   A P2P IP Link is established between 2 nodes when one registers its link local address to the other. The procedure for registering a link local address only requires that the link local address of each peer is unique from the perspective of the other peer, so it does not require any broadcast or third party validation. The registration is typically triggered when receiving an RA messages that indicates a link local address for the router, and advertises that the router supports address registrations by <xref target="RFC8505"/>.
+   </t>
+   <t>
+   Global unicast, anycast and multicast addresses are advertised by hosts to routers using <xref target="RFC8505"/>, and propagated router to router using the SGP under the control of the host.  A special "R" flag in the EARO indicates that the host expects the router to provide return reachability. Upon that flag, the router advertises the registered address in the SGP, with a lifetime that is in the same order as that the router has accepted for the registration.
+   </t>
+   <t>
+   Depending on its scope <xref target="RFC7346"/>, a multicast message may reach up to different boundaries in the Subnet. Admin-Local scope reaches all nodes in the Subnet and leverages the SGP.  Realm-Local scope reaches all the peers in a collection of IP Links, in which case ingress replication and MAC unicast transmission are used.  Link-Local scope reaches all nodes in the broadcast domain of an IP interface, in which case MAC-level broadcast may be used. For instance, an RA message that is sent over the broadcast domain of an IP interface with a Link-Local scope and it will reach beyond the known IP Links over that interface. This is required because the RA message can be the trigger for the creation of the IP Link.
+   </t>
+   <t>
+   When a node roams outside the subnet, meaning that it is physically disconnected from all the routers is the IP Subnet, it may open a tunnel to one anchor router in the  IP Subnet
+   </t>
+   </section><!-- "P2MP Networks" -->
+
+   <section > <name>Advertising Prefixes</name>
    <t>
    By definition, prefixes longer than SPL are inside a Subnet and do not leak outside the SGP.
    Still, it is valid for a node to register a prefix of any size longer than SPL,
    and for the router to advertise the registered prefix in the SGP.
    This can be useful for instance to expose a /96 Prefix that is used to
    transport IPv4 mapped traffic <xref target="RFC6052"/>.
+   </t>
+   <t>
+   In a number of situation (e.g., <xref target="I-D.collink-v6ops-ent64pd"/> and <xref target="I-D.ietf-snac-simple"/> ) it becomes desirable for a node to advertise that it owns a prefix to neighbor routers, and that packets sourced at (in case of multihoming) or destinated to (in case of a stub) that prefix should be passed to this node.
+   At the time of this writing, the prefix is typically delegated by DHCP, and proprietary code ties the DHCP server that   delegates a prefix, or a DHCP relay, and the routers that install a route for the delegated prefix via the delegated node.
+   it is desirable to provide a standard way for the delegated node to advertise the prefix to the neighbor routers and avoid proprietary extensions.
    </t>
    <t>
    <xref target="I-D.thubert-6lo-prefix-registration"/> extends
@@ -849,7 +885,7 @@ The registration in <xref target="RFC8505"/> is abstract to the routing protocol
    request the router to redistribute the prefix in the SGP.
    </t>
 
-   </section><!-- "Advertising Prefixes in the SGP" -->
+   </section><!-- "Advertising Prefixes" -->
 
    </section><!-- "A Framework for Stateful address Autoconfiguration and Subnet Routing" -->
 
@@ -1251,7 +1287,6 @@ In other words, the 6BBRs collectively form a global registrar for the Subnet th
    <displayreference   target="I-D.nordmark-6man-dad-approaches"        to="DAD APPROACHES"/>
    <displayreference   target="I-D.yourtchenko-6man-dad-issues"         to="DAD ISSUES"/>
    <displayreference   target="I-D.vyncke-6man-mcast-not-efficient"     to="MCAST EFFICIENCY"/>
-   <displayreference   target="I-D.ietf-mboned-ieee802-mcast-problems"  to="MCAST PROBLEMS"/>
    <displayreference   target="I-D.bi-savi-wlan"                        to="SAVI"/>
    <displayreference   target="IEEEstd802154"                           to="IEEE Std. 802.15.4"/>
    <displayreference   target="IEEEstd8021"                             to="IEEE Std. 802.1"/>
@@ -1267,6 +1302,7 @@ In other words, the 6BBRs collectively form a global registrar for the Subnet th
        <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6275.xml'/> <!-- Mobility Support in IPv6 -->
        <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6830.xml'/> <!-- LISP -->
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7432.xml'/>
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7346.xml'/> <!-- IPv6 Multicast Address Scopes -->
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8200.xml'/> <!-- Internet Protocol, Version 6 (IPv6) Specification -->
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8505.xml'/> <!-- RFC6775 update -->
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8928.xml'/> <!-- AP-ND  -->
@@ -1281,6 +1317,7 @@ In other words, the 6BBRs collectively form a global registrar for the Subnet th
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4429.xml'/> <!-- ODAD -->
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4903.xml'/> <!-- IPv6  Multi-link Subnet Issues   -->
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6550.xml'/> <!-- RPL: IPv6 Routing Protocol for Low-Power and Lossy Networks -->
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6762.xml'/> <!--  mDNS -->
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6775.xml'/> <!--  IPv6 6LoWPAN ND -->
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7668.xml'/> <!--  IPv6 over BTLE -->      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7217.xml'/> <!--  IPv6 over BTLE -->
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7834.xml'/>
@@ -1293,13 +1330,15 @@ In other words, the 6BBRs collectively form a global registrar for the Subnet th
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.yourtchenko-6man-dad-issues.xml'/>
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.vyncke-6man-mcast-not-efficient.xml'/>
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.9030.xml'/>
-      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-mboned-ieee802-mcast-problems.xml'/>
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.9119.xml'/>
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.bi-savi-wlan.xml'/>
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.thubert-6lo-unicast-lookup.xml'/>
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.thubert-6lo-prefix-registration.xml'/>
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.nordmark-6man-dad-approaches.xml'/>
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.thubert-bess-secure-evpn-mac-signaling.xml'/>
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-snac-simple.xml'/>
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-6lo-multicast-registration.xml'/>
+      <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.collink-v6ops-ent64pd.xml'/>
 
      <reference anchor="IEEEstd802154">
          <front>
