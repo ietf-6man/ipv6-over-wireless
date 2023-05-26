@@ -10,7 +10,7 @@ Expires: 27 November 2023                                      Sandelman
 
 
      Architecture and Framework for IPv6 over Non-Broadcast Access
-                 draft-ietf-6man-ipv6-over-wireless-01
+                 draft-ietf-6man-ipv6-over-wireless-02
 
 Abstract
 
@@ -1703,7 +1703,7 @@ Internet-Draft               IPv6 over NBMA                     May 2023
    dominating set for the IP Subnet, meaning that every router can reach
    every other router directly or via some other routers, and that every
    host that has addresses in the IP Subnet is connected to at least one
-   router that participates to the IGP.
+   router that participates to the SGP.
 
    The connected assumption allows any host to reach any other node in
    the subnet via one or more SGP routers, relying on the SGP alone for

@@ -14,7 +14,7 @@
 <?rfc authorship="yes"?>
 <?rfc tocappendix="yes"?>
 <rfc  xmlns:xi="http://www.w3.org/2001/XInclude" category="info" ipr='trust200902' tocInclude="true"  obsoletes=""
-updates="" consensus="true" submissionType="IETF" xml:lang="en" version="3" docName="draft-ietf-6man-ipv6-over-wireless-01" >
+updates="" consensus="true" submissionType="IETF" xml:lang="en" version="3" docName="draft-ietf-6man-ipv6-over-wireless-02" >
 
 <front>
   <title abbrev="IPv6 over NBMA">Architecture and Framework for IPv6 over Non-Broadcast Access</title>
@@ -841,7 +841,7 @@ The registration in <xref target="RFC8505"/> is abstract to the routing protocol
 
    <section > <name>P2MP Networks</name>
    <t>
-   In the case of P2MP networks, there is not necessarily a direct IP Link between a source and a destination that are in the same subnet. The expectation is that routers running a common SGP form a connected dominating set for the IP Subnet, meaning that every router can reach every other router directly or via some other routers, and that every host that has addresses in the IP Subnet is connected to at least one router that participates to the IGP.
+   In the case of P2MP networks, there is not necessarily a direct IP Link between a source and a destination that are in the same subnet. The expectation is that routers running a common SGP form a connected dominating set for the IP Subnet, meaning that every router can reach every other router directly or via some other routers, and that every host that has addresses in the IP Subnet is connected to at least one router that participates to the SGP.
    </t>
 
    <t>
