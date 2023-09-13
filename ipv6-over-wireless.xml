@@ -14,23 +14,21 @@
 <?rfc authorship="yes"?>
 <?rfc tocappendix="yes"?>
 <rfc  xmlns:xi="http://www.w3.org/2001/XInclude" category="info" ipr='trust200902' tocInclude="true"  obsoletes=""
-updates="" consensus="true" submissionType="IETF" xml:lang="en" version="3" docName="draft-ietf-6man-ipv6-over-wireless-04" >
+updates="" consensus="true" submissionType="IETF" xml:lang="en" version="3" docName="draft-ietf-6man-ipv6-over-wireless-05" >
 
 <front>
   <title abbrev="IPv6 over NBMA">Architecture and Framework for IPv6 over Non-Broadcast Access</title>
 
+
    <author initials='P' surname='Thubert' fullname='Pascal Thubert' role='editor'>
-      <organization abbrev='Cisco Systems'>Cisco Systems, Inc</organization>
+      <!-- <organization abbrev='Cisco Systems'>Cisco Systems, Inc</organization> -->
       <address>
          <postal>
-            <street>Emerald Square, Batiment C</street>
-            <street>rue Evariste Galois </street>
-            <city>BIOT - Sophia Antipolis</city>
-            <code>06410</code>
+            <city>Roquefort-les-Pins</city>
+            <code>06330</code>
           <country>France</country>
          </postal>
-         <phone>+33 497 23 26 34</phone>
-         <email>pthubert@cisco.com</email>
+         <email>pascal.thubert@gmail.com</email>
       </address>
    </author>
 
@@ -375,7 +373,7 @@ updates="" consensus="true" submissionType="IETF" xml:lang="en" version="3" docN
     <li>
       Impact of multicast on performance and reliability
     </li><li>
-      Security exposures from the implicit trust of all opn-link nodes
+      Security exposures from the implicit trust of all on-link nodes
     </li><li>
       On-Demand Neighbor Cache management as a source of performance issues, including exhaustion problems
     </li><li>
@@ -383,7 +381,7 @@ updates="" consensus="true" submissionType="IETF" xml:lang="en" version="3" docN
     </li>
     </ol>
     <t>
-    Table 1 of  <xref target="I-D.ietf-v6ops-nd-considerations">"Which solution solves which issue(s)"</xref> indicates that the
+    Table 1 "Which solution solves which issue(s)" of  <xref target="I-D.ietf-v6ops-nd-considerations"/> indicates that the
     evaluated issues can be alleviated with the framework detailed in <xref target="framework"/>.
     </t>
 
