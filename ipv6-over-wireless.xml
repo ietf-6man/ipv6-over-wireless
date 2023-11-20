@@ -781,16 +781,20 @@ This Architecture combines SFAAC with the not-onlink model on the IP Interfaces.
 
 
 
-   <section anchor="framework" > <name>A Framework for Stateful address Autoconfiguration and Subnet Routing </name>
+   <section anchor="framework" > <name>A Framework for Address and Prefix Registration with Subnet Routing </name>
 
-   <section anchor="int2" > <name>Implementing Stateful address Autoconfiguration</name>
+   <section anchor="int2" > <name>Stateful address Autoconfiguration</name>
 
 
 <t>
-SFAAC was initially standardized for IoT and wireless links as <xref target="RFC6775"/>, <xref target="RFC8505"/>,  and <xref target="RFC8928"/>. A new option in NS/NA messages, the Extended address Registration Option (EARO) signals that the Target address is being registered and provides the registration parameters <xref target="RFC8505"/>. This method allows to prepare and maintain the host routes in the routers and avoids the reactive address Resolution in IPv6 ND and the associated link-layer broadcast transmissions.
+Stateful address Autoconfiguration (SFAAC) was initially standardized for IoT and wireless links as <xref target="RFC6775"/>, <xref target="RFC8505"/>,  and <xref target="RFC8928"/>. The central operation in SFAAC is a new Address Registration mechanism that allows for SFAAC but is not limited to autoconfigured addresses. Indeed, all addresses that the node has should be registered to its router(s).
 </t>
 <t>
-The EARO provides information to the router that is independent to the routing protocol and routing can take multiple forms, from an SGP to a collapsed Hub-and-Spoke model where only one router owns and advertises the prefix.  <xref target="RFC8505"/> is already referenced as the registration interface to <xref target="I-D.ietf-rift-rift">"RIFT: Routing in Fat Trees"</xref> and <xref target="RFC6550">"RPL: IPv6 Routing Protocol for Low-Power and Lossy Networks"</xref> with <xref target="RFC9010"/>.
+To enable Address Registration, a new option in NS/NA messages, the Extended address Registration Option (EARO) signals that the Target address is being registered and provides the registration parameters <xref target="RFC8505"/>. This method allows to prepare and maintain the host routes in the routers and avoids the reactive address Resolution in IPv6 ND and the associated link-layer broadcast transmissions. <xref target="RFC8928"/> adds the capability to verify in future Registrations the ownership of the address or prefix being registered for the first time. This verificatiuon relies on a cryptographic token called a Registration Ownership Verifier (ROVR) that is associated with the address at the first registration and persisted in the network. The ROVR derives from a keypair that can also be autoconfigured by the host, and does not require a Public Key Infrastructure (PKI).
+</t>
+<t>
+The EARO provides information to the router that is agnostic to both the way the address (or prefix) is obtained (e.g., SFAAC or DHCPv6) and the routing operation in the Subnet. This allows to effectively decouple the host operation from the router operation.
+Routing can take multiple forms, from an SGP to a collapsed Hub-and-Spoke model where only one router owns and advertises the prefix.  <xref target="RFC8505"/> is already referenced as the registration interface to <xref target="I-D.ietf-rift-rift">"RIFT: Routing in Fat Trees"</xref> and <xref target="RFC6550">"RPL: IPv6 Routing Protocol for Low-Power and Lossy Networks"</xref> with <xref target="RFC9010"/>.
 </t>
 
 <t>
@@ -808,11 +812,31 @@ This framework allows other implementations of the abstract concept of the regis
 </t>
 
 
-   </section><!-- "Implementing Stateful address Autoconfiguration" -->
+   </section><!-- "Stateful address Autoconfiguration" -->
    <section > <name>Links and Link-Local Addresses</name>
-<t>
-For link-local Addresses, DAD is typically performed between communicating pairs of nodes and an NCE can be populated with a single unicast exchange. In the case of a bridging proxies, though, the link-local traffic is bridged over the backbone and the DAD must proxied there as well.
+<t>Link-local Addresses are typically autoconfigured, though it it is possible to set them some other ways such as configuration.
+With this Architecture, SFAAC is the recommended way to form a link_local address using a P2P Link abstraction.in that case, DAD is performed between communicating pairs of nodes and an NCE can be populated on both sides with a single unicast exchange, as shown in <xref target="figllr"/>. In the case of a bridging proxies, though, the link-local traffic is bridged over the backbone and the DAD must proxied there as well.
 </t>
+
+<figure anchor='figllr'><name> Registration for a Link-Local Address</name>
+ <artwork><![CDATA[
+      (host)            (router)        (registrar)
+         |                  |               |
+         |                  |               |
+         |  ND-Classic RS   |               |
+         |----------------->|               |    L2 broadcast
+         |------------>     |               |
+         |------------------------>         |
+         |  ND-Classic RA   |               |
+         |<-----------------|               |    unicast
+         |                  |               |
+         |  NS(EARO)        |               |
+         |----------------->|               |    unicast
+         |        NA(EARO)  |               |
+         |<-----------------|               |    unicast
+         |                  |
+]]></artwork>
+</figure>
 <t>
 For instance, in the case of Bluetooth(R) Low Energy (BLE) <xref target="RFC7668"/><xref target="IEEEstd802151"/>, the uniqueness of link-local Addresses needs only to be verified between the pair of communicating nodes, the central router and the peripheral host. In that example, 2 peripheral hosts connected to the same central router can not have the same link-local address because the addresses would collision at the central router which could not talk to both over the same network port, unless it can separate the IP Links, e.g., based on the remote MAC address. The DAD operation from SFAAC is appropriate for that use case, but the one from ND is not, because the peripheral hosts are not on the same broadcast domain.
 </t>
@@ -828,7 +852,77 @@ On the other hand, the uniqueness of GUAs and ULAs is validated at the Subnet Le
 
 
 <t>
-SFAAC extends IPv6 ND for Hub-and-Spoke (e.g., BLE) and Route-Over (e.g., RPL) Multi-link subnets (MLSNs).
+As opposed to Link-Local Addresses that are typically autoconfigured, Subnets and Global Addresses may be obtained via DHCPv6 <xref target="RFC8415"/>. In that case, it makes sense to use a ROVR <xref target="RFC8928"/> as device ID (DUID) in the DHCP exchange as illustrated in <xref target="figDHCP"/>.
+</t>
+
+
+<figure anchor='figDHCP'><name> Registration for an Address or Prefix obtained via DHCPv6</name>
+ <artwork><![CDATA[
+      (host)            (router)        (registrar)    (DHCP server)
+         |                  |               |                |
+         |   DMB link       |               |                |
+         |                  |               |                |
+         |  ND-Classic RS   |               |                |
+         |----------------->|               |                |
+         |------------>     |               |                |
+         |------------------------>         |                |
+         |  ND-Classic RA   |               |                |
+         |<-----------------|               |                |
+         |                  |               |                |
+         |                  |               |                |
+         |                 DHCP SOLICIT                      |
+         |-------------------------------------------------->|
+         |------------>     |               |                |
+         |------------------------>         |                |
+         |                   DHCP ADVERTISE                  |
+         |<--------------------------------------------------|
+         |                  |               |                |
+         |             DHCP REQUEST (DUID == ROVR)           |
+         |-------------------------------------------------->|
+         |                 DHCP REPLY (IA-NA or IA-PD)       |
+         |<--------------------------------------------------|
+         |                  |               |                |
+         |  NS(EARO)        |               |                |
+         |----------------->|               |                |
+         |                  |   DHCP LEASEQUERY              |
+         |                  |------------------------------->|
+         |                  |  DHCP LQ-REPLY (DUID == ROVR)  |
+         |                  |<-------------------------------|
+         |                  |               |                |
+         |                  | Extended DAR  |                |
+         |                  |-------------->|                |
+         |                  | Extended DAC  |                |
+         |                  |<--------------|                |
+         |        NA(EARO)  |               |                |
+         |<-----------------|<inject route> ---->            |
+         |                  |               |                |
+         |                  |               |                |
+]]></artwork>
+</figure>
+
+   </section><!--Subnets and Global Addresses-->
+
+
+   <section > <name>Anycast and Multicast Addresses</name>
+   <t>
+   While IPv6 ND is defined for unicast addresses only, <xref target="I-D.ietf-6lo-multicast-registration"/>
+   extends <xref target="RFC8505"/> for anycast and multicast IPv6 addresses. Though RPL <xref target="RFC6550"/>, which is extended in that document, is the SGP of choice in a Low-power Lossy Network (LLN), the registration is agnostic to the SGP and the same model applies to any SGP that is capable of advertising  multicast and/or anycast addresses as well as unicast.
+   </t>
+   <t> <xref target="I-D.ietf-6lo-multicast-registration"/> can be used as a replacement for MLD <xref target="RFC3810"/> for use cases where broadcast are not desirable, and when a device push model such as SFAAC is preferred over a network pull such as MLD and IPv6 ND.
+   With <xref target="RFC8505"/>, the host does not need to define SNMAs for its unicast addresses and does not perform the associated MLDv2 operation. With <xref target="I-D.ietf-6lo-multicast-registration"/>, MLDv2 and its extensive use of broadcast can be totally eliminated.
+   </t>
+   <t>
+   In the case of anycast, the signal enables the 6BBRs to accept more than one registration for the same address, and collectively elect the registering host receives a packet for a given anycast address.
+   </t>
+   </section><!--Anycast and multicast Addresses -->
+
+
+   <section > <name>Hub and Spoke Networks</name>
+
+
+
+<t>
+Address and Prefix Registration extends IPv6 ND for Hub-and-Spoke (e.g., BLE) and Route-Over (e.g., RPL) Multi-link subnets (MLSNs).
 
 </t>
 <t>
@@ -854,20 +948,6 @@ The registration in <xref target="RFC8505"/> is abstract to the routing protocol
 
 
    </section><!--Subnets and Global Addresses-->
-
-
-   <section > <name>Anycast and Multicast Addresses</name>
-   <t>
-   While IPv6 ND is defined for unicast addresses only, <xref target="I-D.ietf-6lo-multicast-registration"/>
-   extends <xref target="RFC8505"/> for anycast and multicast IPv6 addresses. Though RPL <xref target="RFC6550"/>, which is extended in that document, is the SGP of choice in a Low-power Lossy Network (LLN), the registration is agnostic to the SGP and the same model applies to any SGP that is capable of advertising  multicast and/or anycast addresses as well as unicast.
-   </t>
-   <t> <xref target="I-D.ietf-6lo-multicast-registration"/> can be used as a replacement for MLD <xref target="RFC3810"/> for use cases where broadcast are not desirable, and when a device push model such as SFAAC is preferred over a network pull such as MLD and IPv6 ND.
-   With <xref target="RFC8505"/>, the host does not need to define SNMAs for its unicast addresses and does not perform the associated MLDv2 operation. With <xref target="I-D.ietf-6lo-multicast-registration"/>, MLDv2 and its extensive use of broadcast can be totally eliminated.
-   </t>
-   <t>
-   In the case of anycast, the signal enables the 6BBRs to accept more than one registration for the same address, and collectively elect the registering host receives a packet for a given anycast address.
-   </t>
-   </section><!--Anycast and multicast Addresses -->
 
    <section > <name>P2MP Networks</name>
    <t>
@@ -1109,7 +1189,7 @@ P2P links may be federated in Hub-and-Spoke by edge routers, and the Subnet may 
 An example Hub-and-Spoke is an OCB Road-Side Unit (RSU) that owns a prefix, provides Internet connectivity using that prefix to On-Board Units (OBUs) within its physical broadcast domain. An example of Route-Over MLSN is a collection of cars in a parking lot operating RPL to extend the connectivity provided by the RSU beyond its physical broadcast domain. Cars may then operate NEMO <xref target="RFC3963"/> for their own prefix using their address derived from the prefix of the RSU as CareOf address.
 </t>
 <t>
-As opposed to unicast addresses, there is no concept of duplication with multicast and anycast addresses, and there might be multiple registrations from multiple parties for the same address. The router conserves one registration per party per multicast or anycast address, but injects the route into the SGP only once for each address, asynchronously to the registration. On the other hand, the validation exchange with the registrar is still needed if the router checks the right for the host to listen to the anycast or  multicast address.
+As opposed to unicast addresses, there might be multiple registrations from multiple parties for the same address. The router conserves one registration per party per multicast or anycast address, but injects the route into the SGP only once for each address, asynchronously to the registration, as shown in <xref target="figSub"/>. On the other hand, the validation exchange with the registrar is still needed if the router checks the right for the host to listen to the anycast or  multicast address.
 </t>
 
 <figure anchor='figSub'><name> Registration Flow for an anycast or multicast address</name>
