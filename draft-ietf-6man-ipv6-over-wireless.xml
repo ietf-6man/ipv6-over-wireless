@@ -15,7 +15,7 @@
 <?rfc authorship="yes"?>
 <?rfc tocappendix="yes"?>
 <rfc  xmlns:xi="http://www.w3.org/2001/XInclude" category="info" ipr='trust200902' tocInclude="true"  obsoletes=""
-updates="" consensus="true" submissionType="IETF" xml:lang="en" version="3" docName="draft-ietf-6man-ipv6-over-wireless-08" >
+updates="" consensus="true" submissionType="IETF" xml:lang="en" version="3" docName="draft-ietf-6man-ipv6-over-wireless-latest" >
 
 <front>
   <title abbrev="IPv6 over NBMA">Architecture and Framework for IPv6 over Non-Broadcast Access</title>
@@ -237,7 +237,7 @@ updates="" consensus="true" submissionType="IETF" xml:lang="en" version="3" docN
     </t>
     <t>
 	Another way to split the broadcast domain within a Subnet is to proxy the network-layer protocols that
-    rely on link-layer broadcast operations at the boundary of the split broadcast domains, e.g., using 
+    rely on link-layer broadcast operations at the boundary of the split broadcast domains, e.g., using
     the <xref target="IEEEstd80211"/> "ARP proxy" at the Access Point.
     The correct operation of the proxy requires the exhaustive list of the IP addresses for which proxying is provided. Forming and maintaining that knowledge is a hard problem in the general case of radio connectivity, which keeps changing with movements and variations in the environment that alter the range of transmissions.
     It is achieved in Wi-Fi networks through the proactive method of the wireless association, which is akin to the registration procedure in this architecture.
@@ -905,7 +905,7 @@ As opposed to Link-Local Addresses that are typically autoconfigured, Subnets an
    <section > <name>Anycast and Multicast Addresses</name>
    <t>
    While IPv6 ND was initially defined for unicast addresses only, <xref target="RFC9685"/>
-   extends <xref target="RFC8505"/> for anycast and multicast IPv6 addresses as well. 
+   extends <xref target="RFC8505"/> for anycast and multicast IPv6 addresses as well.
    Though RPL <xref target="RFC6550"/>, which is extended in that document, is the SGP of choice in a Low-power Lossy Network (LLN), the registration is agnostic to the SGP and the same model applies to any SGP that is capable of advertising  multicast and/or anycast addresses as well as unicast.
    </t>
    <t> <xref target="RFC9685"/> can be used as a replacement for MLD <xref target="RFC3810"/> for use cases where broadcast are not desirable, and when a device push model such as SFAAC is preferred over a network pull such as MLD and IPv6 ND.
@@ -1459,7 +1459,7 @@ In other words, the 6BBRs collectively form a global registrar for the Subnet th
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8929.xml'/> <!-- backbone router -->
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.9685.xml'/>
       <xi:include href='https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-6lo-prefix-registration.xml'/>
-     
+
 
    </references>
    <references > <name>Informative References</name>
